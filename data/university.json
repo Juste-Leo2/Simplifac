@@ -1,0 +1,1014 @@
+{
+  "universities": [
+    {
+      "official_name": "Université d’Aix-Marseille",
+      "common_name": "Aix-Marseille Université",
+      "components": [
+        "Faculté des arts, lettres, langues, sciences humaines (ALLSH)",
+        "Centre de formation des musiciens intervenants (CFMI)",
+        "Maison méditerranéenne des Sciences de l'homme (MMSH)",
+        "Droit et sciences politiques",
+        "Économie et gestion",
+        "École de journalisme et de communication d’Aix-Marseille (EJCAM)",
+        "Faculté économie et gestion (FEG)",
+        "Institut d’administration des entreprises (IAE)",
+        "Institut régional du travail (IRT)",
+        "Faculté de pharmacie (PHARMA)",
+        "Faculté des sciences médicales et paramédicales de Marseille"
+      ]
+    },
+    {
+      "official_name": "Université d’Amiens",
+      "common_name": "Université de Picardie Jules-Verne",
+      "components": [
+        "UFR des SHSP",
+        "UFR des STAPS",
+        "UFR des Sciences",
+        "UFR d'économie et de gestion",
+        "UFR de droit et science politique",
+        "UFR de Sciences humaines, sociales et philosophie",
+        "UFR des Lettres",
+        "UFR d'Histoire et Géographie",
+        "UFR des Langues et Cultures étrangères",
+        "UFR de médecine",
+        "UFR de pharmacie",
+        "IUT d'Amiens",
+        "Institut d'administration des entreprises (IAE)",
+        "Institut de préparation à l'administration générale (IPAG)",
+        "INSPÉ de l'Académie d'Amiens"
+      ]
+    },
+    {
+      "official_name": "Université d’Angers",
+      "common_name": null,
+      "components": [
+        "Faculté des lettres, langues et sciences humaines",
+        "Faculté de droit, d'économie et de gestion",
+        "Faculté des sciences",
+        "Faculté de santé",
+        "ESTHUA, Faculté de Tourisme, Culture et Hospitalité",
+        "Institut universitaire de technologie (IUT)",
+        "Polytech (ex-ISTIA), École d'ingénieurs",
+        "Institut d'administration des entreprises (IAE Angers)"
+      ]
+    },
+    {
+      "official_name": "Université des Antilles",
+      "common_name": null,
+      "components": [
+        "UFR des sciences juridiques et économiques",
+        "UFR des sciences exactes et naturelles",
+        "UFR des sciences médicales",
+        "UFR de sciences et techniques des activités physiques et sportives (STAPS)",
+        "Faculté Roger-Toumson",
+        "UFR des humanités caribéennes",
+        "UFR de droit et d'économie",
+        "UFR de sciences et technologie de l'environnement",
+        "UFR des lettres et sciences humaines Jean Bernabé"
+      ]
+    },
+    {
+      "official_name": "Université d'Artois",
+      "common_name": null,
+      "components": [
+        "Faculté des sciences Jean Perrin",
+        "IUT de Lens",
+        "Faculté des Sciences Appliquées",
+        "École d'Ingénieurs de l'Artois (EIA)",
+        "IUT de Béthune",
+        "UFR d'Histoire, Géographie, Patrimoines",
+        "UFR de Langues Étrangères",
+        "UFR de Lettres et Arts",
+        "UFR d’Économie, Gestion, Administration et Sciences Sociales (EGASS)",
+        "Université de Droit Alexis de Tocqueville"
+      ]
+    },
+    {
+      "official_name": "Université d'Avignon",
+      "common_name": "Avignon Université",
+      "components": [
+        "Institut Agrosciences, Environnement et Santé (AgES)",
+        "Institut universitaire de technologie d'Avignon (IUT)",
+        "Centre d'enseignement et de recherche en informatique (CERI)",
+        "Institut Culture, Patrimoine, Sociétés numériques (CPSN)"
+      ]
+    },
+    {
+      "official_name": "Université de Bordeaux",
+      "common_name": null,
+      "components": [
+        "Faculté de Médecine",
+        "UFR des Sciences pharmaceutiques",
+        "UFR des Sciences odontologiques",
+        "Institut de Santé Publique, d'Épidémiologie et de Développement",
+        "Institut du thermalisme",
+        "UF des Sciences chimiques",
+        "UF de Mathématiques et interactions",
+        "UF d’Informatique",
+        "UF de Physique",
+        "UF des Sciences de l’ingénieur",
+        "UF des Sciences de la terre et environnement",
+        "Département des langues, lettres et communication",
+        "UF d’Anthropologie",
+        "UF de Psychologie",
+        "UF des Sciences de l’éducation",
+        "UF des Sciences et techniques des activités physiques et sportives (STAPS)",
+        "UF de Sociologie"
+      ]
+    },
+    {
+      "official_name": "Université de Bordeaux-III",
+      "common_name": "Université Bordeaux-Montaigne",
+      "components": [
+        "UFR Humanités",
+        "UFR Langues et Civilisations",
+        "UFR Sciences des territoires et de la communication",
+        "IUT Bordeaux-Montaigne",
+        "Institut de journalisme Bordeaux Aquitaine",
+        "Institut d'aménagement, de tourisme et d'urbanisme (IATU)",
+        "Institut des sciences de l'information et de la communication (ISIC)"
+      ]
+    },
+    {
+      "official_name": "Université de Bretagne-Sud",
+      "common_name": null,
+      "components": [
+        "Faculté de droit, des sciences économiques et de gestion",
+        "Faculté de lettres, langues, sciences humaines et sociales",
+        "Faculté des sciences et sciences de l'ingénieur",
+        "IUT de Lorient",
+        "IUT de Vannes",
+        "École nationale supérieure d'ingénieurs de Bretagne Sud (ENSIBS)"
+      ]
+    },
+    {
+      "official_name": "Université de Caen",
+      "common_name": "Université Caen-Normandie",
+      "components": [
+        "UFR de Droit, AES et administration publique",
+        "UFR Humanités & Sciences sociales",
+        "UFR LVE",
+        "UFR Psychologie",
+        "UFR des Sciences",
+        "UFR SEGGAT",
+        "ESIX Normandie",
+        "IUT Grand Ouest Normandie",
+        "STAPS",
+        "IAE",
+        "UFR Santé",
+        "INSPE de Caen"
+      ]
+    },
+    {
+      "official_name": "Université Savoie Mont Blanc",
+      "common_name": null,
+      "components": [
+        "UFR LLSH",
+        "Faculté de Droit (FD)",
+        "UFR Sciences et Montagne (SceM)",
+        "IUT d'Annecy",
+        "IUT de Chambéry",
+        "IAE Savoie Mont-Blanc",
+        "Polytech Annecy-Chambéry",
+        "Tetras Annecy"
+      ]
+    },
+    {
+      "official_name": "Université de Corse",
+      "common_name": "Università di Corsica Pasquale Paoli",
+      "components": [
+        "UFR Lettres, Langues, Arts, Sciences humaines et sociales",
+        "UFR Droit et Science Politique",
+        "UFR Sciences et Techniques des Activités Physiques et Sportives",
+        "Institut universitaire de santé",
+        "Institut universitaire de technologie",
+        "École de management et d'économie / Institut d'administration des entreprises",
+        "Institut national supérieur du professorat et de l'éducation (INSPÉ)",
+        "École d'ingénieurs Paoli Tech"
+      ]
+    },
+    {
+      "official_name": "Université de Guyane",
+      "common_name": null,
+      "components": [
+        "DFR Droit et sciences économiques",
+        "DFR Lettres, langues, sciences humaines et sociales",
+        "DFR Santé",
+        "DFR Sciences et technologies",
+        "IUT",
+        "INSPE"
+      ]
+    },
+    {
+      "official_name": "Université de La Réunion",
+      "common_name": null,
+      "components": [
+        "UFR Lettres et sciences humaines",
+        "Langues, Littératures & Civilisations Étrangères & Régionales",
+        "Histoire",
+        "Sciences sociales",
+        "Géographie",
+        "Lettres",
+        "Information-Communication"
+      ]
+    },
+    {
+      "official_name": "Université de La Rochelle",
+      "common_name": null,
+      "components": [
+        "Institut Littoral Durable Urbain Intelligent (LUDI)",
+        "Pôle Licences Collegium",
+        "Faculté de Droit, de science politique et de management",
+        "Institut Universitaire de Technologie (IUT)"
+      ]
+    },
+    {
+      "official_name": "Université du Havre",
+      "common_name": "Université Le Havre Normandie",
+      "components": [
+        "UFR sciences et techniques",
+        "Faculté des affaires internationales",
+        "Institut des langues et civilisations orientales",
+        "UFR Humanités et Sociétés",
+        "Institut universitaire de technologie du Havre (IUT du Havre)",
+        "Institut supérieur d'études logistiques (ISEL)"
+      ]
+    },
+    {
+      "official_name": "Université du Mans",
+      "common_name": "Le Mans Université",
+      "components": [
+        "Faculté de Droit, Sciences économiques et de gestion",
+        "Faculté de lettres, langues et sciences humaines",
+        "Faculté des Sciences et Techniques",
+        "Institut universitaire de technologie de Laval",
+        "Institut universitaire de technologie du Mans",
+        "École nationale supérieure d'ingénieurs du Mans (Ensim)",
+        "Institut d’Acoustique Graduate School (IAGS)",
+        "Institut d’Informatique Claude Chappe (ICC)"
+      ]
+    },
+    {
+      "official_name": "Université de Limoges",
+      "common_name": null,
+      "components": [
+        "Faculté de Droit et des Sciences économiques",
+        "Faculté de Médecine",
+        "Faculté de Pharmacie",
+        "Faculté des Lettres et des Sciences Humaines",
+        "Faculté des Sciences et Techniques",
+        "Institut d’ingénierie informatique de Limoges (3iL) (associé)",
+        "Centre de droit et d'économie du sport"
+      ]
+    },
+    {
+      "official_name": "Université du Littoral",
+      "common_name": "Université du Littoral-Côte-d’Opale",
+      "components": [
+        "IUT du Littoral Côte d'Opale",
+        "École d'ingénieurs (EILCO)",
+        "Institut supérieur du commerce international de Dunkerque (ISCID-CO)"
+      ]
+    },
+    {
+      "official_name": "Université de Lyon-I",
+      "common_name": "Université Claude-Bernard-Lyon-I",
+      "components": [
+        "UFR Biosciences",
+        "UFR Faculté des Sciences (Chimie, Mathématiques, Physique...)",
+        "UFR des Sciences et Techniques des Activités Physiques et Sportives (STAPS)",
+        "Faculté de Médecine Lyon Est",
+        "Faculté de Médecine et de Maïeutique Lyon Sud",
+        "Faculté d'Odontologie",
+        "Institut des sciences pharmaceutiques et biologiques (ISPB)",
+        "Institut de pharmacie industrielle de Lyon (IPIL)",
+        "Institut des sciences et techniques de réadaptation (ISTR)",
+        "Institut universitaire de technologie de Lyon I (IUT)",
+        "Institut médico-légal de Lyon (IML)",
+        "Département composante Informatique",
+        "Département composante Mécanique",
+        "Département composante génie électrique"
+      ]
+    },
+    {
+      "official_name": "Université de Lyon-II",
+      "common_name": "Université Lumière-Lyon-II",
+      "components": [
+        "UFR Anthropologie, Sociologie et Sciences politiques (ASSP)",
+        "UFR de Sciences économiques et de Gestion (SEG)",
+        "Faculté de Droit Julie-Victoire-Daubié",
+        "UFR Temps & Territoires (TT)",
+        "UFR des Langues",
+        "UFR Lettres, Sciences du langage et Arts (LESLA)",
+        "Institut de la Communication (ICOM)",
+        "Institut d'Études et du Travail de Lyon (IETL)",
+        "Institut de Formation syndicale (IFS)",
+        "Institut de Psychologie",
+        "Institut des Sciences et des Pratiques d'éducation et de formation (ISPEF)",
+        "Institut universitaire de technologie Lumière"
+      ]
+    },
+    {
+      "official_name": "Université de Lyon-III",
+      "common_name": "Université Jean-Moulin-Lyon-III",
+      "components": [
+        "Faculté de Droit",
+        "Faculté de Philosophie",
+        "Faculté des Humanités, Lettres et Sociétés",
+        "Faculté des Langues",
+        "iaelyon School of Management (IAE Lyon)",
+        "Institut universitaire de technologie (IUT)",
+        "Institut international pour la francophonie (2IF)"
+      ]
+    },
+    {
+      "official_name": "Université de Mulhouse",
+      "common_name": "Université de Haute-Alsace",
+      "components": [
+        "Faculté des lettres, langues et sciences humaines (FLSH)",
+        "Faculté des Sciences Économiques, Sociales et Juridiques (FSESJ)",
+        "Faculté des Sciences et Techniques (FST)",
+        "Faculté de Marketing et d'Agrosciences (FMA)",
+        "École Nationale Supérieure de Chimie de Mulhouse (ENSCMu)",
+        "École Nationale Supérieure d'Ingénieurs Sud-Alsace (ENSISA)",
+        "IUT de Mulhouse",
+        "IUT de Colmar",
+        "UHA Business School"
+      ]
+    },
+    {
+      "official_name": "Université de la Nouvelle-Calédonie",
+      "common_name": null,
+      "components": [
+        "Département Droit, économie et gestion",
+        "Département Lettres, langues et sciences humaines",
+        "Département Sciences et techniques",
+        "Institut universitaire de formation des maîtres (IUFM) / INSPÉ",
+        "Institut universitaire de technologie (IUT)",
+        "Institut d'administration des entreprises (IAE)"
+      ]
+    },
+    {
+      "official_name": "Université d’Orléans",
+      "common_name": null,
+      "components": [
+        "UFR Droit, Economie, Gestion",
+        "UFR Lettres, Langues et Sciences Humaines",
+        "UFR Sciences et Techniques",
+        "INSPE Centre Val de Loire",
+        "Polytech'Orléans",
+        "IUT d'Orléans",
+        "IUT de Bourges",
+        "IUT de Chartres",
+        "IUT de l'Indre (Châteauroux-Issoudun)"
+      ]
+    },
+    {
+      "official_name": "Université de Paris-I",
+      "common_name": "Université Paris 1 Panthéon-Sorbonne",
+      "components": [
+        "UFR 01 - École de Droit de la Sorbonne",
+        "UFR 02 - Économie",
+        "UFR 03 - École d'histoire de l'art et d'archéologie de la Sorbonne (EHAAS)",
+        "UFR 04 - École des arts de la Sorbonne (EAS)",
+        "UFR 05 - Géographie",
+        "UFR 06 - Gestion et économie appliquée",
+        "UFR 07 - Mathématiques et informatique",
+        "UFR 08 - Philosophie",
+        "UFR 09 - Science politique",
+        "UFR 10 - Sciences sociales",
+        "Institut d'administration des entreprises (IAE)",
+        "Institut de démographie",
+        "Institut d'études du développement économique et social (IEDES)",
+        "Institut des sciences sociales du travail"
+      ]
+    },
+    {
+      "official_name": "Université de Paris-III",
+      "common_name": "Université Sorbonne-Nouvelle",
+      "components": [
+        "UFR Arts & médias (AM)",
+        "UFR Littérature, Linguistique, Didactique (LLD)",
+        "UFR Langues, littératures, cultures et sociétés (LLCS)",
+        "Institut d'études européennes (IEE)",
+        "Institut des hautes études de l'Amérique latine (IHEAL)",
+        "Institut du monde anglophone (IMA)"
+      ]
+    },
+    {
+      "official_name": "Sorbonne Université",
+      "common_name": null,
+      "components": [
+        "Faculté des Lettres",
+        "Faculté de Santé",
+        "Faculté des Sciences et Ingénierie",
+        "CELSA - École des hautes études en sciences de l'information et de la communication",
+        "INSPE de l'académie de Paris"
+      ]
+    },
+    {
+      "official_name": "Université de Paris-VIII",
+      "common_name": "Université Paris 8 Vincennes-Saint-Denis",
+      "components": [
+        "UFR AES - Economie et Gestion (AES-EG)",
+        "UFR Arts, philosophie, esthétique",
+        "UFR Culture et communication (CC)",
+        "UFR Droit",
+        "UFR Langues et cultures étrangères",
+        "UFR Mathématiques, informatique, technologies et sciences pour l'ingénieur (MITSI)",
+        "UFR Psychologie",
+        "UFR Sciences de l'éducation, psychanalyse et français langue étrangère (SEPF)",
+        "UFR Sciences du langage",
+        "UFR Textes et sociétés",
+        "Institut d'études européennes (IEE)",
+        "Institut français de géopolitique (IFG)",
+        "IUT de Montreuil",
+        "IUT de Tremblay-en-France"
+      ]
+    },
+    {
+      "official_name": "Université de Paris-X",
+      "common_name": "Université Paris Nanterre",
+      "components": [
+        "UFR de Droit et Science Politique (DSP)",
+        "UFR de Langues et cultures étrangères",
+        "UFR de Lettres, Langues, Philosophie, Communication (LLPhiC)",
+        "UFR de Sciences économiques, Gestion, Mathématiques et Informatique (SEGMI)",
+        "UFR de Sciences et Techniques des Activités Physiques et Sportives (STAPS)",
+        "UFR de Sciences psychologiques et Sciences de l'éducation (SPSE)",
+        "UFR de Sciences sociales et Administration (SSA)",
+        "UFR de Philosophie, Information, Communication, Langages, Littératures, Arts du spectacle (PHILLIA)",
+        "Institut de Préparation à l'Administration Générale (IPAG)",
+        "IUT Ville-d'Avray / Saint-Cloud / Nanterre"
+      ]
+    },
+    {
+      "official_name": "Université de Paris-XII",
+      "common_name": "Université Paris-Est-Créteil-Val-de-Marne",
+      "components": [
+        "Faculté de Médecine",
+        "Faculté de Droit",
+        "Faculté de Lettres, Langues et Sciences humaines",
+        "Faculté de Sciences économiques et de Gestion",
+        "Faculté des Sciences et Technologie",
+        "AEI International School",
+        "École d'Urbanisme de Paris (EUP)",
+        "IAE Paris-Est",
+        "Observatoire des Sciences de l'Univers (OSU)",
+        "IUT de Créteil-Vitry",
+        "IUT de Sénart-Fontainebleau"
+      ]
+    },
+    {
+      "official_name": "Université de Paris-XIII",
+      "common_name": "Université Sorbonne Paris Nord",
+      "components": [
+        "UFR Lettres, Sciences de l'Homme et des Sociétés",
+        "UFR Droit, Sciences politiques et sociales",
+        "UFR Sciences économiques et de gestion",
+        "UFR Santé, Médecine et Biologie humaine",
+        "UFR Sciences de la communication",
+        "Institut Galilée",
+        "IUT de Villetaneuse",
+        "IUT de Saint-Denis",
+        "IUT de Bobigny"
+      ]
+    },
+    {
+      "official_name": "Université d'Évry-Val d'Essonne",
+      "common_name": "Université d'Évry Paris-Saclay",
+      "components": [
+        "UFR Langues, Arts et Musique",
+        "UFR Sciences Fondamentales et Appliquées",
+        "UFR des Sciences de l'Homme et de la Société",
+        "UFR Sciences et Technologies",
+        "IUT d'Évry",
+        "INSPE de l'académie de Versailles"
+      ]
+    },
+    {
+      "official_name": "Université de Versailles-Saint-Quentin-en-Yvelines",
+      "common_name": null,
+      "components": [
+        "Faculté de droit et de science politique (DSP)",
+        "UFR Simone Veil - santé",
+        "UFR des sciences",
+        "UFR des sciences sociales",
+        "Institut d'études culturelles et internationales (IECI)",
+        "Institut supérieur de management (ISM-IAE)",
+        "ISTY (Institut des sciences et techniques des Yvelines)",
+        "IUT de Mantes-en-Yvelines",
+        "IUT de Vélizy",
+        "IUT de Rambouillet"
+      ]
+    },
+    {
+      "official_name": "Université de Pau",
+      "common_name": "Université de Pau et des Pays de l’Adour",
+      "components": [
+        "UFR Droit, économie, gestion",
+        "UFR Lettres, langues, sciences humaines et sport",
+        "UFR Sciences et techniques de Pau",
+        "UFR pluridisciplinaire de Bayonne-Anglet-Biarritz",
+        "UFR Sciences et techniques de la Côte Basque",
+        "École nationale supérieure en génie des technologies industrielles (ENSGTI)",
+        "Institut supérieur aquitain du bâtiment et des travaux publics (ISA BTP)",
+        "Institut d'administration des entreprises Pau-Bayonne (IAE)",
+        "IUT de Bayonne-Pays basque",
+        "IUT des pays de l'Adour"
+      ]
+    },
+    {
+      "official_name": "Université de Perpignan",
+      "common_name": "Université de Perpignan Via Domitia",
+      "components": [
+        "UFR des sciences juridiques et économiques : Faculté de droit et des sciences économiques",
+        "UFR des lettres et sciences humaines : Faculté des lettres et des sciences humaines",
+        "UFR des sciences exactes et expérimentales : Faculté des sciences",
+        "UFR des sciences et techniques des activités physiques et sportives (STAPS)",
+        "Institut d'administration des entreprises (IAE)",
+        "Institut universitaire de technologie (IUT) de Perpignan",
+        "Institut franco-catalan transfrontalier"
+      ]
+    },
+    {
+      "official_name": "Université de Poitiers",
+      "common_name": null,
+      "components": [
+        "Faculté de médecine et pharmacie",
+        "Faculté des sciences fondamentales appliquées",
+        "Faculté de sciences économiques",
+        "Faculté de droit et sciences sociales",
+        "Faculté de lettres et langues",
+        "Faculté des sciences humaines et sociales",
+        "Faculté de sciences du sport",
+        "Institut d'administration des entreprises (IAE)",
+        "Institut universitaire de technologie (IUT) de Poitiers-Niort-Châtellerault",
+        "Institut universitaire de technologie (IUT) d'Angoulême",
+        "Institut de préparation à l'administration générale (IPAG)",
+        "Institut national supérieur du professorat et de l'éducation (INSPE)",
+        "École nationale supérieure d'ingénieurs de Poitiers (ENSI Poitiers)",
+        "École nationale supérieure des sciences applicatives et du risque (ENSAR Niort)"
+      ]
+    },
+    {
+      "official_name": "Université de la Polynésie française",
+      "common_name": null,
+      "components": [
+        "Département Droit, économie et gestion (DEG)",
+        "Département Lettres, langues et sciences humaines (LLSH)",
+        "Département Sciences, technologies et santé (STS)",
+        "INSPE de la Polynésie française"
+      ]
+    },
+    {
+      "official_name": "Université de Reims",
+      "common_name": "Université de Reims-Champagne-Ardenne",
+      "components": [
+        "UFR Lettres et Sciences humaines",
+        "UFR Sciences économiques, sociales et de gestion",
+        "UFR Droit et Science politique",
+        "UFR Sciences exactes et naturelles",
+        "UFR Sciences et Techniques des activités physiques et sportives",
+        "UFR Médecine",
+        "UFR Pharmacie",
+        "UFR Odontologie",
+        "Institut national supérieur du professorat et de l'éducation (Inspé)",
+        "École nationale supérieure d'ingénieurs de Reims (ENSI Reims)",
+        "École d'ingénieurs en sciences industrielles et numérique (EiSINe)",
+        "Institut universitaire de technologie de Reims-Châlons-Charleville",
+        "Institut universitaire de technologie de Troyes",
+        "Institut Georges-Chappaz de la vigne et du vin en Champagne"
+      ]
+    },
+    {
+      "official_name": "Université de Rennes-II",
+      "common_name": "Université Rennes 2",
+      "components": [
+        "UFR d'activités physiques et sportives (STAPS)",
+        "UFR arts, lettres, communication (ALC)",
+        "UFR langues",
+        "UFR sciences humaines",
+        "UFR sciences sociales"
+      ]
+    },
+    {
+      "official_name": "Université de Rouen",
+      "common_name": "Université de Rouen-Normandie",
+      "components": [
+        "UFR Lettres et Sciences humaines",
+        "UFR Sciences de l'Homme et de la Société",
+        "UFR Droit, Sciences économiques et Gestion",
+        "UFR Sciences et Techniques",
+        "UFR Santé",
+        "UFR STAPS",
+        "Institut universitaire de technologie de Rouen",
+        "Institut universitaire de technologie d'Évreux",
+        "Institut de Préparation à l'Administration Générale (IPAG)",
+        "IAE Rouen Normandie",
+        "ESIGELEC (école d'ingénieurs)",
+        "INSPE Normandie Rouen-Le Havre"
+      ]
+    },
+    {
+      "official_name": "Université de Strasbourg",
+      "common_name": null,
+      "components": [
+        "Domaine arts, lettres et langues",
+        "Domaine droit, économie, gestion et sciences politiques et sociales",
+        "Domaine sciences humaines et sociales",
+        "Domaine sciences et technologies",
+        "Domaine santé"
+      ]
+    },
+    {
+      "official_name": "Université de Toulon",
+      "common_name": null,
+      "components": [
+        "UFR Faculté de Droit",
+        "UFR Langues, Lettres et Sciences Humaines",
+        "UFR Sc Economiques et de Gestion",
+        "UFR Ingémédia",
+        "UFR Sciences et Techniques"
+      ]
+    },
+    {
+      "official_name": "Université de Toulouse-II",
+      "common_name": "Université Toulouse-Jean-Jaurès",
+      "components": [
+        "UFR Histoire, arts et archéologie",
+        "UFR Langues, littératures et civilisations étrangères",
+        "UFR Lettres, philosophie, musique, arts, spectacles, communication"
+      ]
+    },
+    {
+      "official_name": "Institut national polytechnique de Toulouse",
+      "common_name": null,
+      "components": [
+        "INP-AgroToulouse",
+        "INP-ENSEEIHT",
+        "INP-ENSIACET"
+      ]
+    },
+    {
+      "official_name": "Université de Tours",
+      "common_name": null,
+      "components": [
+        "UFR d'arts et de sciences humaines",
+        "UFR de droit, d'économie et des sciences sociales",
+        "UFR Centre d'études supérieures de la Renaissance",
+        "UFR de médecine",
+        "Faculté des Sciences et Techniques",
+        "Faculté de Pharmacie",
+        "Institut universitaire de technologie (IUT) de Tours",
+        "Institut universitaire de technologie (IUT) de Blois",
+        "École polytechnique universitaire de Tours (Polytech Tours)",
+        "Institut d'Administration des Entreprises (IAE) de Tours"
+      ]
+    },
+    {
+      "official_name": "Université de Brest",
+      "common_name": "Université de Bretagne-Occidentale",
+      "components": [
+        "Faculté des Sciences du Sport et de l'Éducation",
+        "Faculté des Sciences et Techniques",
+        "Faculté d'Odontologie",
+        "Faculté d'Orthophonie",
+        "Faculté de lettres et sciences humaines",
+        "Faculté de médecine et sciences de la santé",
+        "Faculté de Droit, Economie, Gestion et AES"
+      ]
+    },
+    {
+      "official_name": "Université Bourgogne Europe",
+      "common_name": null,
+      "components": [
+        "Droit et Sciences économique et politique",
+        "Langues et Communication",
+        "Lettres et Philosophie",
+        "Sciences de Santé",
+        "Sciences du Sport (STAPS)",
+        "Sciences et Techniques"
+      ]
+    },
+    {
+      "official_name": "Université Clermont-Auvergne",
+      "common_name": null,
+      "components": [
+        "UFR lettres, culture, sciences humaines",
+        "UFR langues, cultures et communication",
+        "UFR psychologie, sciences sociales, sciences de l'éducation",
+        "UFR sciences et techniques",
+        "UFR de droit",
+        "UFR de médecine",
+        "UFR de pharmacie",
+        "UFR d'odontologie"
+      ]
+    },
+    {
+      "official_name": "Université de Lille",
+      "common_name": null,
+      "components": [
+        "Faculté des humanités (FHUMA)",
+        "Faculté des sciences économiques, sociales et des territoires (FASEST)",
+        "Faculté des langues, cultures et sociétés (LCS)",
+        "Faculté de psychologie et des sciences de l'éducation",
+        "UFR des sciences de la santé et du sport",
+        "UFR de mathématiques, informatique, gestion et électronique"
+      ]
+    },
+    {
+      "official_name": "Université Jean-Monnet-Saint-Étienne",
+      "common_name": null,
+      "components": [
+        "Faculté Arts, Lettres, Langues (ALL)",
+        "Faculté de Droit",
+        "Faculté de Santé",
+        "Faculté de Sciences Humaines et Sociales (SHS)"
+      ]
+    },
+    {
+      "official_name": "Université de Montpellier",
+      "common_name": null,
+      "components": [
+        "Faculté de droit et de science politique",
+        "Faculté d'économie",
+        "Faculté d'éducation",
+        "Faculté de médecine",
+        "Faculté d'odontologie",
+        "Faculté de pharmacie",
+        "Faculté des sciences et techniques des activités physiques et sportives (STAPS)",
+        "Faculté des sciences"
+      ]
+    },
+    {
+      "official_name": "Université de Montpellier Paul-Valéry",
+      "common_name": null,
+      "components": [
+        "Faculté des lettres, arts, philosophie, psychanalyse (UFR 1)",
+        "Faculté de langues et cultures étrangères et régionales (UFR 2)",
+        "Faculté des sciences humaines et des sciences de l'environnement (UFR 3)",
+        "Faculté des sciences sociales, des organisations et des institutions (UFR 4)",
+        "Faculté des sciences du sujet et de la société (UFR 5)"
+      ]
+    },
+    {
+      "official_name": "Université de Nantes",
+      "common_name": "Nantes Université",
+      "components": [
+        "UFR Droit et Sciences Politiques",
+        "UFR Économie et Gestion",
+        "UFR Histoire, Histoire de l'Art et Archéologie",
+        "UFR Langues et Cultures Étrangères",
+        "UFR Lettres et Langage",
+        "UFR Médecine et Techniques Médicales",
+        "UFR Odontologie",
+        "UFR Psychologie",
+        "UFR Sciences et Techniques",
+        "UFR Sociologie",
+        "UFR STAPS"
+      ]
+    },
+    {
+      "official_name": "Université de Nîmes",
+      "common_name": "Nîmes Université",
+      "components": [
+        "Faculté de Psychologie et STAPS",
+        "Faculté des Sciences",
+        "Faculté de Droit, Économie et Gestion"
+      ]
+    },
+    {
+      "official_name": "Université Paris-Cité",
+      "common_name": null,
+      "components": [
+        "Faculté de Santé",
+        "Faculté des Sciences",
+        "Faculté Sociétés et Humanités",
+        "Institut de physique du globe de Paris"
+      ]
+    },
+    {
+      "official_name": "Institut polytechnique de Paris",
+      "common_name": null,
+      "components": [
+        "École polytechnique",
+        "ENSTA Paris",
+        "ENSAE Paris",
+        "Télécom Paris",
+        "Télécom SudParis",
+        "École nationale des ponts et chaussées"
+      ]
+    },
+    {
+      "official_name": "Université Paris-Saclay",
+      "common_name": null,
+      "components": [
+        "Faculté des sciences d'Orsay",
+        "Faculté Jean Monnet (droit, économie, gestion)",
+        "Faculté de pharmacie",
+        "Faculté de médecine",
+        "Faculté des sciences du sport"
+      ]
+    },
+    {
+      "official_name": "Université Marie-et-Louis-Pasteur (Besançon)",
+      "common_name": null,
+      "components": [
+        "UFR Sciences de la santé",
+        "UFR SLHS - Sciences du langage, de l'homme et de la société",
+        "UFR ST - Sciences et techniques",
+        "UFR Sciences juridiques, économiques, politiques et de gestion"
+      ]
+    },
+    {
+      "official_name": "Université de Rennes",
+      "common_name": null,
+      "components": [
+        "Faculté de droit",
+        "Faculté de lettres",
+        "Faculté de médecine et de sciences pharmaceutiques",
+        "Faculté de sciences"
+      ]
+    },
+    {
+      "official_name": "Université de Toulouse Capitole",
+      "common_name": null,
+      "components": [
+        "École de droit de Toulouse",
+        "Faculté d'administration et communication",
+        "Faculté d'informatique",
+        "Toulouse School of Management (TSM)",
+        "Institut Universitaire de Technologie (IUT) de Rodez"
+      ]
+    },
+    {
+      "official_name": "Université de Toulouse",
+      "common_name": null,
+      "components": [
+        "Faculté de santé",
+        "Faculté des sciences du sport et du mouvement humain (F2SMH)",
+        "UFR Sciences et Techniques des Activités Physiques et Sportives (STAPS)",
+        "UFR de Mathématiques, Informatique, Gestion"
+      ]
+    },
+    {
+      "official_name": "Université de Mayotte",
+      "common_name": null,
+      "components": [
+        "Droit Économie Gestion",
+        "Lettres / Sciences Humaines",
+        "Sciences et Technologies",
+        "Sciences de l'Éducation"
+      ]
+    },
+    {
+      "official_name": "Université de technologie de Belfort-Montbéliard",
+      "common_name": null,
+      "components": []
+    },
+    {
+      "official_name": "Université de technologie de Compiègne",
+      "common_name": null,
+      "components": []
+    },
+    {
+      "official_name": "Université de technologie de Troyes",
+      "common_name": null,
+      "components": []
+    },
+    {
+      "official_name": "Université de technologie de Tarbes",
+      "common_name": null,
+      "components": [
+        "École nationale d'ingénieurs de Tarbes (ENIT)",
+        "IUT de Tarbes"
+      ]
+    },
+    {
+      "official_name": "CY Cergy Paris Université",
+      "common_name": null,
+      "components": [
+        "CY faculté de droit",
+        "CY école de design",
+        "CY langues et études internationales",
+        "CY lettres et sciences humaines",
+        "CY Tech",
+        "Institut d'Économie et de Gestion",
+        "Institut des Sciences et Techniques",
+        "IUT",
+        "École de journalisme de Gennevilliers",
+        "Institut libre d'éducation physique supérieur (ILEPS)",
+        "École pratique de service social (EPSS)"
+      ]
+    },
+    {
+      "official_name": "Université Côte d'Azur",
+      "common_name": null,
+      "components": [
+        "École universitaire de Recherche SPECTRUM",
+        "École universitaire de Recherche DS4H",
+        "École universitaire de Recherche LIFE"
+      ]
+    },
+    {
+      "official_name": "Université Grenoble Alpes",
+      "common_name": null,
+      "components": [
+        "UFR arts et sciences humaines",
+        "UFR sociétés, cultures et langues étrangères",
+        "UFR langage, lettres, arts du spectacle"
+      ]
+    },
+    {
+      "official_name": "Université polytechnique Hauts-de-France",
+      "common_name": null,
+      "components": [
+        "Institut National des Sciences Appliquées des Hauts-de-France",
+        "Institut Sociétés et Humanités",
+        "Faculté de droit, d'économie et de gestion (FDEG)",
+        "Faculté des lettres, langues, arts et sciences humaines (FLLASH)",
+        "Institut d'administration des entreprises (IAE)",
+        "Institut de préparation à l'administration générale (IPAG)",
+        "IUT de Valenciennes",
+        "École Nationale Supérieure d'Ingénieurs en Informatique, Automatique, Mécanique, Énergétique et Électronique (ENSIAME)",
+        "Institut des Sciences et Techniques de Valenciennes (ISTV)",
+        "Faculté des Sciences et des Métiers du Sport (FSMS)"
+      ]
+    },
+    {
+      "official_name": "Université de Lorraine",
+      "common_name": null,
+      "components": [
+        "Faculté des Sciences et Technologies",
+        "Faculté de Droit, sciences économiques et gestion – Nancy",
+        "Faculté de Médecine, Maïeutique et métiers de la Santé à Nancy",
+        "Faculté de Pharmacie de Lorraine"
+      ]
+    },
+    {
+      "official_name": "Université Paris-Dauphine",
+      "common_name": null,
+      "components": []
+    },
+    {
+      "official_name": "Université Panthéon-Assas",
+      "common_name": null,
+      "components": [
+        "Département de droit privé et de sciences criminelles",
+        "Département de droit public et de science politique",
+        "Département d'économie",
+        "Département de gestion"
+      ]
+    },
+    {
+      "official_name": "Université Paris sciences et lettres (PSL)",
+      "common_name": null,
+      "components": [
+        "Chimie ParisTech - PSL",
+        "Conservatoire national supérieur d'art dramatique - PSL (CNSAD - PSL)",
+        "École nationale des chartes - PSL (ENC - PSL)",
+        "École nationale supérieure d'architecture de Paris-Malaquais - PSL",
+        "École des arts décoratifs - PSL (ENSAD - PSL)",
+        "École normale supérieure - PSL (ENS - PSL)",
+        "École pratique des hautes études - PSL (EPHE - PSL)",
+        "École supérieure de physique et de chimie industrielles de la ville de Paris - PSL (ESPCI - PSL)",
+        "École nationale supérieure des mines de Paris - PSL (Mines Paris - PSL)",
+        "Observatoire de Paris - PSL",
+        "Université Paris Dauphine - PSL"
+      ]
+    },
+    {
+      "official_name": "Université Gustave Eiffel (Marne-la-Vallée)",
+      "common_name": null,
+      "components": [
+        "UFR Lettres, arts, communication et technologies",
+        "UFR Sciences humaines et sociales",
+        "UFR Sciences économiques et de gestion",
+        "UFR STAPS",
+        "UFR Mathématiques",
+        "UFR Langues et civilisations",
+        "IFSA Sciences Appliquées"
+      ]
+    },
+    {
+      "official_name": "Normandie Université",
+      "common_name": null,
+      "components": [
+        "Université de Caen Normandie",
+        "Université de Rouen Normandie",
+        "Université Le Havre Normandie",
+        "INSA Rouen Normandie",
+        "ENSICAEN",
+        "ENSA Normandie"
+      ]
+    },
+    {
+      "official_name": "Université de Toulouse (Comue expérimentale)",
+      "common_name": null,
+      "components": [
+        "École d'ingénieurs de Purpan"
+      ]
+    }
+  ]
+}

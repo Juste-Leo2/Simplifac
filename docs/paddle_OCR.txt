@@ -1,0 +1,51 @@
+Recherche Fourni par deepseek :
+
+### 🧠 Le Fonctionnement en Deux Étapes
+
+La magie opère grâce à une combinaison simple et efficace :
+1.  **Vous fournissez les modèles** : Vous placez les fichiers de modèle (`.onnx`) dans le dossier `assets` de votre projet React Native.
+2.  **La bibliothèque s'en charge** : Lorsque vous initialisez `Ocr.create()`, vous lui indiquez le chemin vers ces fichiers. La bibliothèque utilise ensuite ONNX Runtime pour charger et exécuter ces modèles directement sur l'appareil, sans aucune connexion internet.
+
+### ✍️ Mise en Pratique : Un Exemple Concret
+
+Voici à quoi ressemble le code pour initialiser l'OCR avec vos propres modèles. C'est presque identique à l'exemple de base, mais avec une configuration explicite des chemins :
+
+```typescript
+import Ocr from '@gutenye/ocr-react-native';
+
+// Initialisation avec vos modèles embarqués
+const ocr = await Ocr.create({
+  models: {
+    // Chemin vers le modèle de détection dans vos assets
+    detectionPath: 'assets/models/ch_PP-OCRv4_det_infer.onnx',
+    // Chemin vers le modèle de reconnaissance
+    recognitionPath: 'assets/models/ch_PP-OCRv4_rec_infer.onnx',
+    // Chemin vers le dictionnaire de caractères (fichier .txt)
+    dictionaryPath: 'assets/models/ppocr_keys_v1.txt'
+  }
+});
+
+// Utilisation simple
+const result = await ocr.detect('/path/to/your/photo.jpg');
+```
+
+### 🔬 Comprendre l'Architecture pour Aller Plus Loin
+
+Si vous souhaitez maîtriser totalement le processus, il est utile de savoir que la bibliothèque est construite comme une architecture à plusieurs étages:
+
+*   **Le socle (`@gutenye/ocr-models`)** : Ce package contient les modèles ONNX et les ca. Vous pouvez utiliser les modèles par défaut ou, et c'est ce qui nous intéresse, les remplacer par les vôtres.
+*   **La logique (`@gutenye/ocr-common`)** : Ce package contient le code qui orchestre le pipeline OCR et reste indépendant de la plateforme.
+*   **L'adaptateur (`@gutenye/ocr-react-native`)** : C'est le package que vous installez. Il fait le lien entre le code TypeScript de votre application et le code natif (C++ via JSI) qui fait tourner ONNX Runtime sur Android et iOS.
+
+Modèle pour le français et les langues latine: 
+https://huggingface.co/monkt/paddleocr-onnx/tree/main
+votre-projet/
+├── android/
+├── ios/
+├── src/
+├── assets/
+│   └── models/
+│       ├── det.onnx          ← À télécharger
+│       ├── rec.onnx          ← Vous l'avez déjà
+│       └── dict.txt          ← Vous l'avez déjà
+└── package.json
