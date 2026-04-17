@@ -42,6 +42,7 @@ Cette roadmap est volontairement découpée en micro-tâches atomiques. L'object
 *L'objectif est de valider le "moteur" de l'application : transformer une image en conseil tout en protégeant les données.*
 
 ### 🛠️ OCR & Extraction
+- [x] Intégrer l'appareil photo du téléphone pour capturer un document (`react-native-image-picker`).
 - [ ] Installer et configurer **PaddleOCR** (ou alternative locale performante).
 - [ ] Créer le service `src/services/ocrService.ts` pour extraire le texte brut d'une image.
 - [ ] Valider l'extraction sur des documents types (Bourse, courriers administratifs).
