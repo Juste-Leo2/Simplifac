@@ -1,5 +1,5 @@
 import { launchCamera, CameraOptions } from 'react-native-image-picker';
-import { PermissionsAndroid, Platform, Alert } from 'react-native';
+import { PermissionsAndroid, Platform, Alert, Linking } from 'react-native';
 
 export const takePhoto = async (): Promise<string | null> => {
   if (Platform.OS === 'android') {
@@ -27,6 +27,19 @@ export const takePhoto = async (): Promise<string | null> => {
 
         // Si l'utilisateur a dit OK, on lance la vraie popup système Android (sans rationale)
         const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+        
+        if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+          Alert.alert(
+            "Caméra bloquée",
+            "L'accès à la caméra a été désactivé définitivement. Veuillez l'autoriser manuellement dans les paramètres de l'application.",
+            [
+              { text: "Annuler", style: "cancel" },
+              { text: "Ouvrir les paramètres", onPress: () => Linking.openSettings() }
+            ]
+          );
+          return null;
+        }
+
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
           console.log('Permission caméra refusée par l\'utilisateur au niveau système.');
           return null;
