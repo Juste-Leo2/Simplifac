@@ -116,4 +116,7 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // Google ML Kit Text Recognition (Modèle compilé EN LOCAL dans l'APK - 'Bundled')
+    implementation 'com.google.mlkit:text-recognition:16.0.1'
 }

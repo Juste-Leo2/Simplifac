@@ -16,6 +16,7 @@ end
 
 target 'TempApp' do
   config = use_native_modules!
+  pod 'GoogleMLKit/TextRecognition'
 
   use_react_native!(
     :path => config[:reactNativePath],
