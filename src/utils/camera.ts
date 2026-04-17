@@ -64,6 +64,7 @@ export const takePhoto = async (): Promise<string | null> => {
       return null;
     }
     if (response.errorCode) {
+      Alert.alert("Erreur", "Une erreur est survenue lors de l'ouverture de la caméra.");
       console.error('Camera error:', response.errorMessage);
       return null;
     }
