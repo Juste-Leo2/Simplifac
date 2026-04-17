@@ -12,6 +12,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
 import { ThemeColors } from '../types/theme';
+import { takePhoto } from '../utils/camera';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -21,8 +22,16 @@ export default function DashboardScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { colors, isDark } = useTheme();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
-
-  const handleAction = (actionName: string) => {
+  const handleAction = async (actionName: string) => {
+    if (actionName === 'scanner_document') {
+      const uri = await takePhoto();
+      if (uri) {
+        // La photo a été confirmée nativement par la caméra du téléphone (pas besoin de double validation)
+        console.log('Photo capturée et validée nativement:', uri);
+        // FIXME: Ajouter l'action à faire après validation (redirection, envoi, etc.)
+      }
+      return;
+    }
     // Action temporaire pour l'interaction
     console.log('Action pressée:', actionName);
   };
