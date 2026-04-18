@@ -43,9 +43,9 @@ Cette roadmap est volontairement découpée en micro-tâches atomiques. L'object
 
 ### 🛠️ OCR & Extraction
 - [x] Intégrer l'appareil photo du téléphone pour capturer un document (`react-native-image-picker`).
-- [ ] Installer et configurer **PaddleOCR** (ou alternative locale performante).
-- [ ] Créer le service `src/services/ocrService.ts` pour extraire le texte brut d'une image.
-- [ ] Valider l'extraction sur des documents types (Bourse, courriers administratifs).
+- [x] Installer et configurer **Google ML Kit** (Local & Performant).
+- [x] Créer le service `src/services/ocr.ts` pour extraire le texte brut d'une image.
+- [x] Valider l'extraction sur des documents types (via Alertes de test).
 
 ### 🛡️ Pipeline d'Anonymisation (Hybride)
 - [ ] Créer `src/services/anonymizer.ts`.

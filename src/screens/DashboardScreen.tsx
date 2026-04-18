@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,6 +14,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
 import { ThemeColors } from '../types/theme';
 import { takePhoto } from '../utils/camera';
+import { recognizeTextFromImage } from '../services/ocr';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -34,7 +36,23 @@ export default function DashboardScreen({ navigation }: Props) {
         if (uri) {
           // La photo a été confirmée nativement par la caméra du téléphone (pas besoin de double validation)
           console.log('Photo capturée et validée nativement:', uri);
-          // FIXME: Ajouter l'action à faire après validation (redirection, envoi, etc.)
+          
+          const recognizedText = await recognizeTextFromImage(uri);
+          if (recognizedText) {
+            console.log('Texte OCR extrait avec succès:', recognizedText.substring(0, 100) + '...');
+            
+            // FIXME: Rediriger vers l'écran de traitement complet une fois le design validé
+            // Pour le moment, on affiche simplement le texte dans une alerte pour s'assurer qu'il a bien été extrait.
+            Alert.alert(
+              "Texte Extrait 📸", 
+              recognizedText.length > 300 ? recognizedText.substring(0, 300) + "..." : recognizedText,
+              [{ text: "Super", style: "default" }]
+            );
+            
+          } else {
+            console.warn('Aucun texte reconnu ou erreur OCR');
+            Alert.alert("Erreur OCR", "Aucun texte reconnu", [{text: "OK"}]);
+          }
         }
       } finally {
         isProcessingRef.current = false;
