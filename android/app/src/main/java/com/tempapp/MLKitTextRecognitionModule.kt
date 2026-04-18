@@ -11,6 +11,8 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 class MLKitTextRecognitionModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
+    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
     override fun getName(): String {
         return "MLKitTextRecognition"
     }
@@ -20,7 +22,6 @@ class MLKitTextRecognitionModule(reactContext: ReactApplicationContext) : ReactC
         try {
             val uri = Uri.parse(imageUri)
             val image = InputImage.fromFilePath(reactApplicationContext, uri)
-            val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
             recognizer.process(image)
                 .addOnSuccessListener { visionText ->
@@ -32,5 +33,10 @@ class MLKitTextRecognitionModule(reactContext: ReactApplicationContext) : ReactC
         } catch (e: Exception) {
             promise.reject("OCR_ERROR", "Image invalide ou introuvable", e)
         }
+    }
+
+    override fun onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy()
+        recognizer.close()
     }
 }
