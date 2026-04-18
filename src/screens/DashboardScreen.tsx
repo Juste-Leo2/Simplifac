@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -42,19 +43,15 @@ export default function DashboardScreen({ navigation }: Props) {
             
             // FIXME: Rediriger vers l'écran de traitement complet une fois le design validé
             // Pour le moment, on affiche simplement le texte dans une alerte pour s'assurer qu'il a bien été extrait.
-            import('react-native').then(({ Alert }) => {
-                Alert.alert(
-                  "Texte Extrait 📸", 
-                  recognizedText.length > 300 ? recognizedText.substring(0, 300) + "..." : recognizedText,
-                  [{ text: "Super", style: "default" }]
-                );
-            });
+            Alert.alert(
+              "Texte Extrait 📸", 
+              recognizedText.length > 300 ? recognizedText.substring(0, 300) + "..." : recognizedText,
+              [{ text: "Super", style: "default" }]
+            );
             
           } else {
             console.warn('Aucun texte reconnu ou erreur OCR');
-            import('react-native').then(({ Alert }) => {
-                Alert.alert("Erreur OCR", "Aucun texte reconnu", [{text: "OK"}]);
-            });
+            Alert.alert("Erreur OCR", "Aucun texte reconnu", [{text: "OK"}]);
           }
         }
       } finally {

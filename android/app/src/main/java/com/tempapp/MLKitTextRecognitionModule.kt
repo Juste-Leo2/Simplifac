@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlin.concurrent.thread
 
 class MLKitTextRecognitionModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -19,19 +20,21 @@ class MLKitTextRecognitionModule(reactContext: ReactApplicationContext) : ReactC
 
     @ReactMethod
     fun recognizeText(imageUri: String, promise: Promise) {
-        try {
-            val uri = Uri.parse(imageUri)
-            val image = InputImage.fromFilePath(reactApplicationContext, uri)
+        thread {
+            try {
+                val uri = Uri.parse(imageUri)
+                val image = InputImage.fromFilePath(reactApplicationContext, uri)
 
-            recognizer.process(image)
-                .addOnSuccessListener { visionText ->
-                    promise.resolve(visionText.text)
-                }
-                .addOnFailureListener { e ->
-                    promise.reject("OCR_ERROR", "Échec de l'analyse du texte", e)
-                }
-        } catch (e: Exception) {
-            promise.reject("OCR_ERROR", "Image invalide ou introuvable", e)
+                recognizer.process(image)
+                    .addOnSuccessListener { visionText ->
+                        promise.resolve(visionText.text)
+                    }
+                    .addOnFailureListener { e ->
+                        promise.reject("OCR_ERROR", "Échec de l'analyse du texte", e)
+                    }
+            } catch (e: Exception) {
+                promise.reject("OCR_ERROR", "Image invalide ou introuvable", e)
+            }
         }
     }
 
