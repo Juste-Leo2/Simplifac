@@ -23,8 +23,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ApiKeys'>;
 interface ProviderInfo {
   id: AIProvider;
   name: string;
-  icon: string;
-  model: string;
   keyUrl: string;
   keyUrlLabel: string;
 }
@@ -32,17 +30,13 @@ interface ProviderInfo {
 const PROVIDERS: ProviderInfo[] = [
   {
     id: 'google',
-    name: 'Google AI',
-    icon: '🔮',
-    model: 'gemma-4-26b-a4b-it',
+    name: 'Google',
     keyUrl: 'https://aistudio.google.com/api-keys',
     keyUrlLabel: 'aistudio.google.com/api-keys',
   },
   {
     id: 'groq',
     name: 'Groq',
-    icon: '⚡',
-    model: 'openai/gpt-oss-20b',
     keyUrl: 'https://console.groq.com/keys',
     keyUrlLabel: 'console.groq.com/keys',
   },
@@ -139,7 +133,14 @@ export default function ApiKeysScreen({ navigation }: Props) {
 
   const getBorderColor = (provider: AIProvider): Animated.AnimatedInterpolation<string> => {
     const status = statuses[provider];
-    if (status === 'idle' || status === 'testing') {
+    if (status === 'testing') {
+      // Pulse during loading
+      return glowAnims[provider].interpolate({
+        inputRange: [0, 0.5, 1],
+        outputRange: ['rgba(147, 51, 234, 0.2)', 'rgba(147, 51, 234, 0.6)', 'rgba(147, 51, 234, 0.2)'],
+      });
+    }
+    if (status === 'idle') {
       return glowAnims[provider].interpolate({
         inputRange: [0, 1],
         outputRange: ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.05)'],
@@ -180,16 +181,7 @@ export default function ApiKeysScreen({ navigation }: Props) {
       >
         {/* Header */}
         <View style={styles.cardHeader}>
-          <View style={styles.cardHeaderLeft}>
-            <Text style={styles.cardIcon}>{provider.icon}</Text>
-            <View>
-              <Text style={styles.cardTitle}>{provider.name}</Text>
-              <Text style={styles.cardModel}>{provider.model}</Text>
-            </View>
-          </View>
-          {status === 'testing' && <ActivityIndicator size="small" color="#9333EA" />}
-          {status === 'valid' && <Text style={styles.statusValid}>✓ Active</Text>}
-          {status === 'invalid' && <Text style={styles.statusInvalid}>✕ Erreur</Text>}
+          <Text style={styles.cardTitle}>{provider.name}</Text>
         </View>
 
         {/* Input zone */}
@@ -227,20 +219,21 @@ export default function ApiKeysScreen({ navigation }: Props) {
               activeOpacity={0.8}
               onPress={() => handleDelete(provider.id)}
             >
-              <Text style={styles.deleteButtonText}>Supprimer</Text>
+              <Text style={styles.deleteButtonText}>Effacer</Text>
             </TouchableOpacity>
           )}
         </View>
 
-        {/* Link to get key */}
-        <TouchableOpacity
-          style={styles.linkRow}
-          activeOpacity={0.7}
-          onPress={() => Linking.openURL(provider.keyUrl)}
-        >
-          <Text style={styles.linkIcon}>🔗</Text>
-          <Text style={styles.linkText}>Obtenir une clé : {provider.keyUrlLabel}</Text>
-        </TouchableOpacity>
+        {/* Link to get key - Only show if not valid */}
+        {status !== 'valid' && status !== 'testing' && (
+          <TouchableOpacity
+            style={styles.getButton}
+            activeOpacity={0.7}
+            onPress={() => Linking.openURL(provider.keyUrl)}
+          >
+            <Text style={styles.getButtonText}>Obtenir une clé 🔗</Text>
+          </TouchableOpacity>
+        )}
       </Animated.View>
     );
   };
@@ -348,38 +341,13 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  cardHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardIcon: {
-    fontSize: 28,
-    marginRight: 14,
+    marginBottom: 12,
   },
   cardTitle: {
     color: '#F3F4F6',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  cardModel: {
-    color: '#9CA3AF',
-    fontSize: 13,
-    marginTop: 2,
-  },
-  statusValid: {
-    color: '#22C55E',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  statusInvalid: {
-    color: '#EF4444',
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '600',
+    opacity: 0.9,
   },
   inputRow: {
     marginBottom: 14,
@@ -428,18 +396,19 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-  linkRow: {
-    flexDirection: 'row',
+  getButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    paddingVertical: 10,
     alignItems: 'center',
-    paddingTop: 4,
+    justifyContent: 'center',
+    marginTop: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
-  linkIcon: {
-    fontSize: 14,
-    marginRight: 8,
-  },
-  linkText: {
+  getButtonText: {
     color: '#818CF8',
     fontSize: 13,
-    textDecorationLine: 'underline',
+    fontWeight: '600',
   },
 });
