@@ -74,7 +74,7 @@ export const StorageService = {
 
   // --- Profil Utilisateur (PII) ---
   getProfile: (): UserProfile | null => {
-    if (!secureStorage) throw new Error('Secure storage not initialized');
+    if (!secureStorage) return null;
     try {
       const data = secureStorage.getString(PROFILE_KEY);
       if (data) {
@@ -90,7 +90,7 @@ export const StorageService = {
   },
 
   saveProfile: (profile: UserProfile): void => {
-    if (!secureStorage) throw new Error('Secure storage not initialized');
+    if (!secureStorage) return;
     try {
       secureStorage.set(PROFILE_KEY, JSON.stringify(profile));
     } catch (e) {
@@ -100,7 +100,7 @@ export const StorageService = {
 
   // --- Clés API (chiffré) ---
   saveApiKey: (provider: AIProvider, key: string): void => {
-    if (!secureStorage) throw new Error('Secure storage not initialized');
+    if (!secureStorage) return;
     try {
       secureStorage.set(`${API_KEY_PREFIX}${provider}`, key);
     } catch (e) {
@@ -109,7 +109,7 @@ export const StorageService = {
   },
 
   getApiKey: (provider: AIProvider): string | null => {
-    if (!secureStorage) throw new Error('Secure storage not initialized');
+    if (!secureStorage) return null;
     try {
       return secureStorage.getString(`${API_KEY_PREFIX}${provider}`) ?? null;
     } catch (e) {
@@ -119,7 +119,7 @@ export const StorageService = {
   },
 
   deleteApiKey: (provider: AIProvider): void => {
-    if (!secureStorage) throw new Error('Secure storage not initialized');
+    if (!secureStorage) return;
     try {
       secureStorage.remove(`${API_KEY_PREFIX}${provider}`);
     } catch (e) {
