@@ -181,7 +181,10 @@ export default function ApiKeysScreen({ navigation }: Props) {
       >
         {/* Header */}
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>{provider.name}</Text>
+          <Text style={styles.cardTitle}>
+            {status === 'valid' ? '✅ ' : status === 'invalid' ? '❌ ' : '🔑 '}
+            {provider.name}
+          </Text>
         </View>
 
         {/* Input zone */}
@@ -259,7 +262,7 @@ export default function ApiKeysScreen({ navigation }: Props) {
       <View style={styles.infoBanner}>
         <Text style={styles.infoIcon}>ℹ️</Text>
         <Text style={styles.infoText}>
-          Tes clés sont stockées localement et chiffrées sur ton appareil. Elles ne transitent jamais par nos serveurs.
+          Tes clés proviennent de sources reconnues et de confiance. Elles sont cumulables pour obtenir plus de requêtes. Elles sont stockées localement et chiffrées sur ton appareil et ne transitent jamais par nos serveurs.
         </Text>
       </View>
 
