@@ -2,9 +2,11 @@ import 'react-native-get-random-values';
 import { createMMKV } from 'react-native-mmkv';
 import * as Keychain from 'react-native-keychain';
 import { UserPreferences, UserProfile } from '../types/storage';
+import type { AIProvider } from './ai';
 
 const SETTINGS_KEY = 'simplifac_settings';
 const PROFILE_KEY = 'simplifac_profile';
+const API_KEY_PREFIX = 'api_key_';
 
 // Instance standard pour les réglages non sensibles (thème, langue...)
 export const storage = createMMKV({
@@ -95,4 +97,34 @@ export const StorageService = {
       console.error('Failed to save profile to secure MMKV:', e);
     }
   },
+
+  // --- Clés API (chiffré) ---
+  saveApiKey: (provider: AIProvider, key: string): void => {
+    if (!secureStorage) return;
+    try {
+      secureStorage.set(`${API_KEY_PREFIX}${provider}`, key);
+    } catch (e) {
+      console.error(`Failed to save ${provider} API key:`, e);
+    }
+  },
+
+  getApiKey: (provider: AIProvider): string | null => {
+    if (!secureStorage) return null;
+    try {
+      return secureStorage.getString(`${API_KEY_PREFIX}${provider}`) ?? null;
+    } catch (e) {
+      console.error(`Failed to read ${provider} API key:`, e);
+      return null;
+    }
+  },
+
+  deleteApiKey: (provider: AIProvider): void => {
+    if (!secureStorage) return;
+    try {
+      secureStorage.remove(`${API_KEY_PREFIX}${provider}`);
+    } catch (e) {
+      console.error(`Failed to delete ${provider} API key:`, e);
+    }
+  },
 };
+
