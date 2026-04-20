@@ -94,12 +94,14 @@ export default function ApiKeysScreen({ navigation }: Props) {
 
     setStatuses(prev => ({ ...prev, [provider]: 'testing' }));
 
-    // Save key first
-    StorageService.saveApiKey(provider, key);
-
     // Test it
     const ok = await testApiKey(provider, key);
     const result = ok ? 'valid' : 'invalid';
+    
+    if (ok) {
+      StorageService.saveApiKey(provider, key);
+    }
+
     setStatuses(prev => ({ ...prev, [provider]: result }));
     animateGlow(provider, result);
 
