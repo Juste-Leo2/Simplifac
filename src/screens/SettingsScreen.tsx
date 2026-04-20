@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { useFocusEffect } from '@react-navigation/native';
+import { StorageService } from '../services/storage';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
@@ -20,6 +22,17 @@ export default function SettingsScreen({ navigation }: Props) {
   // États locaux (Mock) pour la UI
   const [isColorBlindMode, setIsColorBlindMode] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [configuredKeyCount, setConfiguredKeyCount] = useState(0);
+
+  // Recalculate key count every time the screen is focused (e.g. coming back from ApiKeys)
+  useFocusEffect(
+    useCallback(() => {
+      let count = 0;
+      if (StorageService.getApiKey('google')) count++;
+      if (StorageService.getApiKey('groq')) count++;
+      setConfiguredKeyCount(count);
+    }, []),
+  );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -45,12 +58,20 @@ export default function SettingsScreen({ navigation }: Props) {
         {/* SECTION : IA & MOTEUR */}
         <Text style={styles.sectionTitle}>Moteur IA</Text>
         <View style={styles.cardGroup}>
-          <TouchableOpacity style={styles.buttonRow} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.buttonRow}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('ApiKeys')}
+          >
             <View style={styles.rowLeft}>
               <Text style={styles.rowIcon}>🔑</Text>
               <View>
-                <Text style={styles.rowTitle}>Clé API (OpenAI / Anthropic)</Text>
-                <Text style={styles.rowSubtitle}>Non configurée</Text>
+                <Text style={styles.rowTitle}>Clés API (Google / Groq)</Text>
+                <Text style={styles.rowSubtitle}>
+                  {configuredKeyCount > 0
+                    ? `${configuredKeyCount} clé${configuredKeyCount > 1 ? 's' : ''} configurée${configuredKeyCount > 1 ? 's' : ''}`
+                    : 'Non configurée'}
+                </Text>
               </View>
             </View>
             <Text style={styles.chevron}>→</Text>
