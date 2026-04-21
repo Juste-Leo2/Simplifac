@@ -1,4 +1,4 @@
-package com.tempapp
+package com.simplifac
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
