@@ -35,7 +35,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   // isDark est vrai pour dark et colorblind (les deux ont un fond sombre)
-  const isDark = themeType !== 'light';
+  const isDark = themeType === 'dark' || themeType === 'colorblind';
 
   const activeColors = colorsByTheme[themeType];
 
