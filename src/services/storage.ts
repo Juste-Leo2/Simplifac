@@ -1,11 +1,12 @@
 import 'react-native-get-random-values';
 import { createMMKV } from 'react-native-mmkv';
 import * as Keychain from 'react-native-keychain';
-import { UserPreferences, UserProfile } from '../types/storage';
+import { UserPreferences, UserProfile, CurriculumData } from '../types/storage';
 import type { AIProvider } from './ai';
 
 const SETTINGS_KEY = 'simplifac_settings';
 const PROFILE_KEY = 'simplifac_profile';
+const CURRICULUM_KEY = 'simplifac_curriculum';
 const API_KEY_PREFIX = 'api_key_';
 
 // Instance standard pour les réglages non sensibles (thème, langue...)
@@ -124,6 +125,32 @@ export const StorageService = {
       secureStorage.remove(`${API_KEY_PREFIX}${provider}`);
     } catch (e) {
       console.error(`Failed to delete ${provider} API key:`, e);
+    }
+  },
+
+  // --- Maquette / Curriculum ---
+  getCurriculum: (): CurriculumData | null => {
+    if (!secureStorage) return null;
+    try {
+      const data = secureStorage.getString(CURRICULUM_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (typeof parsed === 'object' && parsed !== null) {
+          return parsed as CurriculumData;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse curriculum from secure MMKV:', e);
+    }
+    return null;
+  },
+
+  saveCurriculum: (curriculum: CurriculumData): void => {
+    if (!secureStorage) return;
+    try {
+      secureStorage.set(CURRICULUM_KEY, JSON.stringify(curriculum));
+    } catch (e) {
+      console.error('Failed to save curriculum to secure MMKV:', e);
     }
   },
 };

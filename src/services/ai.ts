@@ -59,3 +59,82 @@ async function groqGenerate(apiKey: string, message: string): Promise<string> {
   });
   return response.output_text ?? '';
 }
+
+const CURRICULUM_PROMPT = `Tu es un assistant qui analyse les maquettes pédagogiques universitaires françaises.
+À partir du document fourni, extrais les informations et retourne UNIQUEMENT un tableau JSON valide (sans commentaire, sans markdown, juste le JSON).
+Chaque objet doit contenir :
+- "semester" (string, ex: "S1", "S2")
+- "ue" (string, nom de l'UE si présent, sinon "")
+- "subject" (string, nom de la matière)
+- "teacher" (string, nom de l'enseignant si disponible, sinon "")
+- "coefficient" (number, coefficient si disponible, sinon 1)
+- "ects" (number, crédits ECTS si disponible, sinon 0)
+
+Si une information n'est pas trouvée, utilise les valeurs par défaut indiquées.
+Retourne [] si aucune matière n'est identifiable.`;
+
+type CurriculumResult = Array<Omit<import('../types/storage').CurriculumEntry, 'id'>>;
+
+/**
+ * Parses curriculum data from text (OCR) or PDF (base64).
+ * source: 'text' for OCR plain text, 'pdf' for base64-encoded PDF.
+ */
+export async function parseCurriculumText(
+  provider: AIProvider,
+  apiKey: string,
+  rawContent: string,
+  source: 'text' | 'pdf' = 'text',
+): Promise<CurriculumResult> {
+  let response: string;
+
+  if (source === 'pdf') {
+    // PDF: utiliser l'API multimodale de Gemini (seul provider qui le supporte)
+    if (provider !== 'google') {
+      throw new Error('Le scan PDF nécessite une clé Google Gemini (API multimodale).');
+    }
+    response = await googleGenerateWithPdf(apiKey, CURRICULUM_PROMPT, rawContent);
+  } else {
+    // Texte OCR: envoi classique
+    const message = `${CURRICULUM_PROMPT}\n\nTexte de la maquette :\n${rawContent}`;
+    response = await generateAIResponse(provider, apiKey, message);
+  }
+
+  console.log('[AI] Réponse brute (500 premiers chars):', response.substring(0, 500));
+
+  // Extraire le JSON de la réponse (au cas où l'IA ajoute du texte autour)
+  const jsonMatch = response.match(/\[[\s\S]*\]/);
+  if (!jsonMatch) return [];
+
+  try {
+    const parsed = JSON.parse(jsonMatch[0]);
+    if (!Array.isArray(parsed)) return [];
+    return parsed;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Sends a PDF (base64) to Gemini using its multimodal API.
+ */
+async function googleGenerateWithPdf(apiKey: string, prompt: string, pdfBase64: string): Promise<string> {
+  const ai = new GoogleGenAI({ apiKey });
+  const response = await ai.models.generateContent({
+    model: PROVIDER_CONFIG.google.model,
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          { text: prompt },
+          {
+            inlineData: {
+              mimeType: 'application/pdf',
+              data: pdfBase64,
+            },
+          },
+        ],
+      },
+    ],
+  });
+  return response.text ?? '';
+}
