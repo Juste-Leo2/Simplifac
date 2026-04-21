@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
-import { ThemeType, ThemeColors, Theme } from '../types/theme';
-import { darkColors, lightColors } from './theme';
+import React, { createContext, useContext, useState } from 'react';
+import { ThemeType, ThemeColors } from '../types/theme';
+import { darkColors, lightColors, colorblindColors } from './theme';
 import { StorageService } from '../services/storage';
 
 interface ThemeContextProps {
@@ -13,24 +12,32 @@ interface ThemeContextProps {
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const systemColorScheme = useColorScheme();
+const colorsByTheme: Record<ThemeType, ThemeColors> = {
+  light: lightColors,
+  dark: darkColors,
+  colorblind: colorblindColors,
+};
 
-  // Lecture de la préférence (ou par défaut 'system')
-  const [themeType, setThemeTypeState] = useState<ThemeType>(() => StorageService.getPreferences()?.theme || 'system');
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Lecture de la préférence (ou par défaut 'dark')
+  const [themeType, setThemeTypeState] = useState<ThemeType>(() => {
+    const saved = StorageService.getPreferences()?.theme;
+    // Migrer l'ancien 'system' vers 'dark'
+    if (!saved || saved === ('system' as string)) return 'dark';
+    return saved;
+  });
 
   const setThemeType = (type: ThemeType) => {
     setThemeTypeState(type);
     // Sauvegarder la préférence
-    const currentPrefs = StorageService.getPreferences() || { theme: 'system' };
+    const currentPrefs = StorageService.getPreferences() || { theme: 'dark' };
     StorageService.savePreferences({ ...currentPrefs, theme: type });
   };
 
-  // Logique pour déterminer si on est en light ou dark (en ce moment, on va forcer le dark comme avant)
-  const isDark = themeType === 'dark' || (themeType === 'system' && systemColorScheme === 'dark');
+  // isDark est vrai pour dark et colorblind (les deux ont un fond sombre)
+  const isDark = themeType !== 'light';
 
-  // On utilise darkColors si isDark est vrai, sinon lightColors.
-  const activeColors = isDark ? darkColors : lightColors;
+  const activeColors = colorsByTheme[themeType];
 
   return (
     <ThemeContext.Provider value={{ themeType, setThemeType, colors: activeColors, isDark }}>

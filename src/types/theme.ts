@@ -1,4 +1,4 @@
-export type ThemeType = 'light' | 'dark' | 'system';
+export type ThemeType = 'light' | 'dark' | 'colorblind';
 
 export interface ThemeColors {
   background: string;

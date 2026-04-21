@@ -13,9 +13,9 @@ export const darkColors: ThemeColors = {
   surfaceHighlight: 'rgba(147, 51, 234, 0.15)', // L'effet d'icône tuile
 };
 
-// Mode clair (Pour l'instant, on met des valeurs standards mais modifiables plus tard)
+// Mode clair
 export const lightColors: ThemeColors = {
-  background: '#F9FAFB', 
+  background: '#F9FAFB',
   surface: '#FFFFFF',
   primary: '#7E22CE', // Violet un peu plus foncé pour contraster
   text: '#111827',
@@ -25,4 +25,19 @@ export const lightColors: ThemeColors = {
   divider: 'rgba(0, 0, 0, 0.1)',
   shadow: '#000000',
   surfaceHighlight: 'rgba(126, 34, 206, 0.1)',
+};
+
+// Mode Daltonien — palette optimisée pour deutéranopie / protanopie
+// Utilise un contraste élevé avec des bleus et oranges (Wong palette)
+export const colorblindColors: ThemeColors = {
+  background: '#1A1A2E', // Bleu nuit profond
+  surface: '#16213E',    // Bleu marine foncé
+  primary: '#E69F00',    // Orange Wong — très visible pour tous les types de daltonisme
+  text: '#F0F0F0',       // Blanc légèrement atténué
+  textSecondary: '#A0B4C8', // Bleu-gris clair
+  iconPrimary: '#F0F0F0',
+  iconSecondary: '#7B99B5',
+  divider: 'rgba(255, 255, 255, 0.12)',
+  shadow: '#000000',
+  surfaceHighlight: 'rgba(230, 159, 0, 0.15)', // Orange Wong transparent
 };
