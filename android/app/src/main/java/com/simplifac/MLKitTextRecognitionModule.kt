@@ -1,4 +1,4 @@
-package com.tempapp
+package com.simplifac
 
 import android.net.Uri
 import com.facebook.react.bridge.Promise
