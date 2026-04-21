@@ -118,7 +118,7 @@ export default function SettingsScreen({ navigation }: Props) {
                     <Text
                       style={[
                         styles.segmentLabel,
-                        { color: isActive ? '#FFFFFF' : colors.textSecondary },
+                        { color: isActive ? (themeType === 'colorblind' ? '#000000' : '#FFFFFF') : colors.textSecondary },
                         isActive && styles.segmentLabelActive,
                       ]}
                       numberOfLines={1}
