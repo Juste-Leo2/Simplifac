@@ -30,7 +30,7 @@ export default function SettingsScreen({ navigation }: Props) {
   const { themeType, setThemeType, colors, isDark } = useTheme();
 
   // État local pour le compteur de clés API
-  const [configuredKeyCount, setConfiguredKeyCount] = React.useState(0);
+  const [configuredKeyCount, setConfiguredKeyCount] = useState(0);
 
   // Recalculate key count every time the screen is focused (e.g. coming back from ApiKeys)
   useFocusEffect(
