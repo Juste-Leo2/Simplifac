@@ -279,8 +279,8 @@ export default function CurriculumScreen({ navigation }: Props) {
         ue: p.ue || '',
         subject: p.subject || '',
         teacher: p.teacher || '',
-        coefficient: p.coefficient || 1,
-        ects: p.ects || 0,
+        coefficient: (p.coefficient ?? 1).toString(),
+        ects: (p.ects ?? 0).toString(),
       }));
 
       console.log('[PROCESS-AI] Succès:', newEntries.length, 'matière(s) extraite(s)');
