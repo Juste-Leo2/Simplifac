@@ -34,8 +34,8 @@ const createEmptyEntry = (): CurriculumEntry => ({
   ue: '',
   subject: '',
   teacher: '',
-  coefficient: 1,
-  ects: 0,
+  coefficient: '1',
+  ects: '0',
 });
 
 export default function CurriculumScreen({ navigation }: Props) {
@@ -50,6 +50,7 @@ export default function CurriculumScreen({ navigation }: Props) {
   // Semester modal state
   const [semesterModalVisible, setSemesterModalVisible] = React.useState(false);
   const [semesterEditingId, setSemesterEditingId] = React.useState<string | null>(null);
+  const hasInitialized = React.useRef(false);
 
   // Charger les données au montage
   React.useEffect(() => {
@@ -57,11 +58,12 @@ export default function CurriculumScreen({ navigation }: Props) {
     if (saved && saved.entries.length > 0) {
       setEntries(saved.entries);
     }
+    hasInitialized.current = true;
   }, []);
 
   // Sauvegarder à chaque modification
   React.useEffect(() => {
-    if (entries.length > 0) {
+    if (hasInitialized.current) {
       StorageService.saveCurriculum({
         entries,
         lastUpdated: new Date().toISOString(),
@@ -269,7 +271,7 @@ export default function CurriculumScreen({ navigation }: Props) {
             placeholderTextColor="#6B7280"
             keyboardType="numeric"
             value={entry.coefficient.toString()}
-            onChangeText={v => updateEntry(entry.id, 'coefficient', parseFloat(v) || 0)}
+            onChangeText={v => updateEntry(entry.id, 'coefficient', v)}
           />
         </View>
         <View style={styles.fieldSmall}>
@@ -280,7 +282,7 @@ export default function CurriculumScreen({ navigation }: Props) {
             placeholderTextColor="#6B7280"
             keyboardType="numeric"
             value={entry.ects.toString()}
-            onChangeText={v => updateEntry(entry.id, 'ects', parseFloat(v) || 0)}
+            onChangeText={v => updateEntry(entry.id, 'ects', v)}
           />
         </View>
       </View>

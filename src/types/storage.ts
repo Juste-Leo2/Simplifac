@@ -22,8 +22,8 @@ export interface CurriculumEntry {
   ue: string;
   subject: string;
   teacher: string;
-  coefficient: number;
-  ects: number;
+  coefficient: number | string;
+  ects: number | string;
 }
 
 export interface CurriculumData {
