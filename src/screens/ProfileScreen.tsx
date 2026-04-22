@@ -264,11 +264,8 @@ export default function ProfileScreen({ navigation }: Props) {
               placeholderTextColor="#6B7280"
             />
           </View>
-        </View>
 
-        {/* SECTION : COMPLEMENTS ADMINISTRATIFS */}
-        <Text style={styles.sectionTitle}>Informations Complémentaires</Text>
-        <View style={styles.cardGroup}>
+          <View style={styles.separator} />
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Statut (CROUS)</Text>
             <TouchableOpacity onPress={() => setShowCrousModal(true)} style={styles.modalSelectBtn}>
@@ -280,9 +277,14 @@ export default function ProfileScreen({ navigation }: Props) {
           </View>
 
           <View style={styles.separator} />
-          <TouchableOpacity style={styles.scannerButton} activeOpacity={0.8} onPress={() => { }}>
-            <Text style={styles.scannerIcon}>📄</Text>
-            <Text style={styles.scannerText}>Scanner ta maquette / Modalités de contrôle des connaissances</Text>
+          <TouchableOpacity
+            style={styles.scannerButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('Curriculum')}
+          >
+            <Text style={styles.scannerIcon}>📋</Text>
+            <Text style={styles.scannerText}>Ma filière</Text>
+            <Text style={styles.chevron}>▶</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

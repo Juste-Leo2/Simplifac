@@ -15,3 +15,18 @@ export interface UserProfile {
   hasScholarship: boolean;
   hasHousing: boolean;
 }
+
+export interface CurriculumEntry {
+  id: string;
+  semester: string;
+  ue: string;
+  subject: string;
+  teacher: string;
+  coefficient: number | string;
+  ects: number | string;
+}
+
+export interface CurriculumData {
+  entries: CurriculumEntry[];
+  lastUpdated: string;
+}
