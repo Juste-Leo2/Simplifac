@@ -9,6 +9,7 @@ import {
   StatusBar,
   Alert,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -38,6 +39,106 @@ const createEmptyEntry = (): CurriculumEntry => ({
   ects: '0',
 });
 
+// --- Memoized Card Component ---
+const CurriculumEntryCard = React.memo(({
+  entry,
+  index,
+  onUpdate,
+  onRemove,
+  onOpenSemester,
+  styles
+}: {
+  entry: CurriculumEntry;
+  index: number;
+  onUpdate: (id: string, field: keyof CurriculumEntry, value: string | number) => void;
+  onRemove: (id: string) => void;
+  onOpenSemester: (id: string) => void;
+  styles: any;
+}) => (
+  <View style={styles.entryCard}>
+    <View style={styles.entryHeader}>
+      <Text style={styles.entryNumber}>#{index + 1}</Text>
+      <TouchableOpacity
+        onPress={() => onRemove(entry.id)}
+        style={styles.deleteBtn}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.deleteIcon}>✕</Text>
+      </TouchableOpacity>
+    </View>
+
+    <View style={styles.entryRow}>
+      <View style={styles.fieldSmall}>
+        <Text style={styles.fieldLabel}>Semestre</Text>
+        <TouchableOpacity
+          style={styles.semesterBtn}
+          onPress={() => onOpenSemester(entry.id)}
+        >
+          <Text style={styles.semesterText}>{entry.semester}</Text>
+          <Text style={styles.chevronSmall}>▼</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.fieldLarge}>
+        <Text style={styles.fieldLabel}>UE</Text>
+        <TextInput
+          style={styles.fieldInput}
+          placeholder="Ex: UE1 Fondamentaux"
+          placeholderTextColor="#6B7280"
+          value={entry.ue}
+          onChangeText={v => onUpdate(entry.id, 'ue', v)}
+        />
+      </View>
+    </View>
+
+    <View style={styles.entryRowSingle}>
+      <Text style={styles.fieldLabel}>Matière</Text>
+      <TextInput
+        style={styles.fieldInput}
+        placeholder="Ex: Mathématiques"
+        placeholderTextColor="#6B7280"
+        value={entry.subject}
+        onChangeText={v => onUpdate(entry.id, 'subject', v)}
+      />
+    </View>
+
+    <View style={styles.entryRowSingle}>
+      <Text style={styles.fieldLabel}>Enseignant</Text>
+      <TextInput
+        style={styles.fieldInput}
+        placeholder="Ex: M. Dupont"
+        placeholderTextColor="#6B7280"
+        value={entry.teacher}
+        onChangeText={v => onUpdate(entry.id, 'teacher', v)}
+      />
+    </View>
+
+    <View style={styles.entryRow}>
+      <View style={styles.fieldSmall}>
+        <Text style={styles.fieldLabel}>Coef.</Text>
+        <TextInput
+          style={styles.fieldInput}
+          placeholder="1"
+          placeholderTextColor="#6B7280"
+          keyboardType="numeric"
+          value={entry.coefficient.toString()}
+          onChangeText={v => onUpdate(entry.id, 'coefficient', v)}
+        />
+      </View>
+      <View style={styles.fieldSmall}>
+        <Text style={styles.fieldLabel}>ECTS</Text>
+        <TextInput
+          style={styles.fieldInput}
+          placeholder="0"
+          placeholderTextColor="#6B7280"
+          keyboardType="numeric"
+          value={entry.ects.toString()}
+          onChangeText={v => onUpdate(entry.id, 'ects', v)}
+        />
+      </View>
+    </View>
+  </View>
+));
+
 export default function CurriculumScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { colors, isDark } = useTheme();
@@ -61,29 +162,32 @@ export default function CurriculumScreen({ navigation }: Props) {
     hasInitialized.current = true;
   }, []);
 
-  // Sauvegarder à chaque modification
+  // Sauvegarder avec un léger délai (debounce) pour éviter les lags lors de la saisie
   React.useEffect(() => {
     if (hasInitialized.current) {
-      StorageService.saveCurriculum({
-        entries,
-        lastUpdated: new Date().toISOString(),
-      });
+      const timeout = setTimeout(() => {
+        StorageService.saveCurriculum({
+          entries,
+          lastUpdated: new Date().toISOString(),
+        });
+      }, 500);
+      return () => clearTimeout(timeout);
     }
   }, [entries]);
 
-  const updateEntry = (id: string, field: keyof CurriculumEntry, value: string | number) => {
+  const updateEntry = React.useCallback((id: string, field: keyof CurriculumEntry, value: string | number) => {
     setEntries(prev =>
       prev.map(e => (e.id === id ? { ...e, [field]: value } : e)),
     );
-  };
+  }, []);
 
-  const removeEntry = (id: string) => {
+  const removeEntry = React.useCallback((id: string) => {
     setEntries(prev => prev.filter(e => e.id !== id));
-  };
+  }, []);
 
-  const addEntry = () => {
+  const addEntry = React.useCallback(() => {
     setEntries(prev => [...prev, createEmptyEntry()]);
-  };
+  }, []);
 
   // --- Scan logic ---
   const handleScanPdf = async () => {
@@ -196,98 +300,7 @@ export default function CurriculumScreen({ navigation }: Props) {
     }
   };
 
-  const renderEntry = (entry: CurriculumEntry, index: number) => (
-    <View key={entry.id} style={styles.entryCard}>
-      {/* Header de la carte : numéro + supprimer */}
-      <View style={styles.entryHeader}>
-        <Text style={styles.entryNumber}>#{index + 1}</Text>
-        <TouchableOpacity
-          onPress={() => removeEntry(entry.id)}
-          style={styles.deleteBtn}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.deleteIcon}>✕</Text>
-        </TouchableOpacity>
-      </View>
 
-      {/* Ligne 1 : Semestre + UE */}
-      <View style={styles.entryRow}>
-        <View style={styles.fieldSmall}>
-          <Text style={styles.fieldLabel}>Semestre</Text>
-          <TouchableOpacity
-            style={styles.semesterBtn}
-            onPress={() => {
-              setSemesterEditingId(entry.id);
-              setSemesterModalVisible(true);
-            }}
-          >
-            <Text style={styles.semesterText}>{entry.semester}</Text>
-            <Text style={styles.chevronSmall}>▼</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.fieldLarge}>
-          <Text style={styles.fieldLabel}>UE</Text>
-          <TextInput
-            style={styles.fieldInput}
-            placeholder="Ex: UE1 Fondamentaux"
-            placeholderTextColor="#6B7280"
-            value={entry.ue}
-            onChangeText={v => updateEntry(entry.id, 'ue', v)}
-          />
-        </View>
-      </View>
-
-      {/* Ligne 2 : Matière */}
-      <View style={styles.entryRowSingle}>
-        <Text style={styles.fieldLabel}>Matière</Text>
-        <TextInput
-          style={styles.fieldInput}
-          placeholder="Ex: Mathématiques"
-          placeholderTextColor="#6B7280"
-          value={entry.subject}
-          onChangeText={v => updateEntry(entry.id, 'subject', v)}
-        />
-      </View>
-
-      {/* Ligne 3 : Enseignant */}
-      <View style={styles.entryRowSingle}>
-        <Text style={styles.fieldLabel}>Enseignant</Text>
-        <TextInput
-          style={styles.fieldInput}
-          placeholder="Ex: M. Dupont"
-          placeholderTextColor="#6B7280"
-          value={entry.teacher}
-          onChangeText={v => updateEntry(entry.id, 'teacher', v)}
-        />
-      </View>
-
-      {/* Ligne 4 : Coef + ECTS */}
-      <View style={styles.entryRow}>
-        <View style={styles.fieldSmall}>
-          <Text style={styles.fieldLabel}>Coef.</Text>
-          <TextInput
-            style={styles.fieldInput}
-            placeholder="1"
-            placeholderTextColor="#6B7280"
-            keyboardType="numeric"
-            value={entry.coefficient.toString()}
-            onChangeText={v => updateEntry(entry.id, 'coefficient', v)}
-          />
-        </View>
-        <View style={styles.fieldSmall}>
-          <Text style={styles.fieldLabel}>ECTS</Text>
-          <TextInput
-            style={styles.fieldInput}
-            placeholder="0"
-            placeholderTextColor="#6B7280"
-            keyboardType="numeric"
-            value={entry.ects.toString()}
-            onChangeText={v => updateEntry(entry.id, 'ects', v)}
-          />
-        </View>
-      </View>
-    </View>
-  );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -306,56 +319,72 @@ export default function CurriculumScreen({ navigation }: Props) {
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView
+      <FlatList
+        data={entries}
+        keyExtractor={item => item.id}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
         showsVerticalScrollIndicator={false}
-      >
-        {/* Bannière info */}
-        <View style={styles.infoBanner}>
-          <Text style={styles.infoIcon}>📋</Text>
-          <View style={styles.infoTextContainer}>
-            <Text style={styles.infoTitle}>Tes matières & enseignants</Text>
-            <Text style={styles.infoText}>
-              Remplis le tableau manuellement ou scanne ta maquette pour pré-remplir automatiquement.
-            </Text>
-          </View>
-        </View>
-
-        {/* Bouton Scanner */}
-        <TouchableOpacity
-          style={styles.scanButton}
-          activeOpacity={0.8}
-          onPress={() => setShowScanChoice(true)}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color={colors.text} style={styles.scanIconLoader} />
-          ) : (
-            <Text style={styles.scanButtonIcon}>📄</Text>
-          )}
-          <View style={styles.scanButtonTextContainer}>
-            <Text style={styles.scanButtonTitle}>
-              {loading ? 'Analyse en cours...' : 'Scanner ta maquette'}
-            </Text>
-            <Text style={styles.scanButtonSubtitle}>PDF ou photo de ta maquette / MCC</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Tableau des matières */}
-        {entries.length > 0 && (
-          <Text style={styles.sectionTitle}>
-            Matières ({entries.length})
-          </Text>
+        renderItem={({ item, index }) => (
+          <CurriculumEntryCard
+            entry={item}
+            index={index}
+            styles={styles}
+            onUpdate={updateEntry}
+            onRemove={removeEntry}
+            onOpenSemester={(id) => {
+              setSemesterEditingId(id);
+              setSemesterModalVisible(true);
+            }}
+          />
         )}
+        ListHeaderComponent={
+          <>
+            {/* Bannière info */}
+            <View style={styles.infoBanner}>
+              <Text style={styles.infoIcon}>📋</Text>
+              <View style={styles.infoTextContainer}>
+                <Text style={styles.infoTitle}>Tes matières & enseignants</Text>
+                <Text style={styles.infoText}>
+                  Remplis le tableau manuellement ou scanne ta maquette pour pré-remplir automatiquement.
+                </Text>
+              </View>
+            </View>
 
-        {entries.map((entry, index) => renderEntry(entry, index))}
+            {/* Bouton Scanner */}
+            <TouchableOpacity
+              style={styles.scanButton}
+              activeOpacity={0.8}
+              onPress={() => setShowScanChoice(true)}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color={colors.text} style={styles.scanIconLoader} />
+              ) : (
+                <Text style={styles.scanButtonIcon}>📄</Text>
+              )}
+              <View style={styles.scanButtonTextContainer}>
+                <Text style={styles.scanButtonTitle}>
+                  {loading ? 'Analyse en cours...' : 'Scanner ta maquette'}
+                </Text>
+                <Text style={styles.scanButtonSubtitle}>PDF ou photo de ta maquette / MCC</Text>
+              </View>
+            </TouchableOpacity>
 
-        {/* Bouton ajouter */}
-        <TouchableOpacity style={styles.addButton} onPress={addEntry} activeOpacity={0.8}>
-          <Text style={styles.addButtonIcon}>＋</Text>
-          <Text style={styles.addButtonText}>Ajouter une matière</Text>
-        </TouchableOpacity>
-      </ScrollView>
+            {/* Titre de section */}
+            {entries.length > 0 && (
+              <Text style={styles.sectionTitle}>
+                Matières ({entries.length})
+              </Text>
+            )}
+          </>
+        }
+        ListFooterComponent={
+          <TouchableOpacity style={styles.addButton} onPress={addEntry} activeOpacity={0.8}>
+            <Text style={styles.addButtonIcon}>＋</Text>
+            <Text style={styles.addButtonText}>Ajouter une matière</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* Modal choix de scan */}
       <BottomSelectModal
