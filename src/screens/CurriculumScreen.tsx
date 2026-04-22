@@ -17,7 +17,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
 import { ThemeColors } from '../types/theme';
 import { CurriculumEntry } from '../types/storage';
-import { StorageService } from '../services/storage';
+import { StorageService, initSecureStorage } from '../services/storage';
 import { parseCurriculumText } from '../services/ai';
 import { recognizeTextFromImage } from '../services/ocr';
 import { takePhoto } from '../utils/camera';
@@ -155,11 +155,19 @@ export default function CurriculumScreen({ navigation }: Props) {
 
   // Charger les données au montage
   React.useEffect(() => {
-    const saved = StorageService.getCurriculum();
-    if (saved && saved.entries.length > 0) {
-      setEntries(saved.entries);
-    }
-    hasInitialized.current = true;
+    const loadData = async () => {
+      try {
+        await initSecureStorage();
+        const saved = StorageService.getCurriculum();
+        if (saved && saved.entries.length > 0) {
+          setEntries(saved.entries);
+        }
+        hasInitialized.current = true;
+      } catch (error) {
+        console.error('Failed to load curriculum:', error);
+      }
+    };
+    loadData();
   }, []);
 
   // Sauvegarder avec un léger délai (debounce) pour éviter les lags lors de la saisie
