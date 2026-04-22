@@ -44,6 +44,11 @@ async function googleGenerate(apiKey: string, message: string): Promise<string> 
   const response = await ai.models.generateContent({
     model: PROVIDER_CONFIG.google.model,
     contents: message,
+    config: {
+      thinkingConfig: {
+        includeThoughts: false,
+      },
+    },
   });
   return response.text ?? '';
 }
@@ -135,6 +140,11 @@ async function googleGenerateWithPdf(apiKey: string, prompt: string, pdfBase64: 
         ],
       },
     ],
+    config: {
+      thinkingConfig: {
+        includeThoughts: false,
+      },
+    },
   });
   return response.text ?? '';
 }
