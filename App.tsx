@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { ThemeProvider } from './src/utils/ThemeContext';
+import { UserProvider } from './src/utils/UserContext';
 import { initSecureStorage } from './src/services/storage';
 
 const App = () => {
@@ -50,11 +51,13 @@ const App = () => {
 
   return (
     <ThemeProvider>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </SafeAreaProvider>
+      <UserProvider>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </UserProvider>
     </ThemeProvider>
   );
 }
