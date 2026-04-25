@@ -55,6 +55,24 @@ export default function DashboardScreen({ navigation }: Props) {
     console.log('Action pressée:', actionName);
   };
 
+  const handleDeleteSession = (sessionId: string) => {
+    Alert.alert(
+      "Supprimer la discussion",
+      "Veux-tu supprimer cette discussion de l'historique ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        { 
+          text: "Supprimer", 
+          style: "destructive", 
+          onPress: () => {
+            StorageService.deleteChatSession(sessionId);
+            setChatSessions(StorageService.getChatSessions());
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.background} />
@@ -129,7 +147,16 @@ export default function DashboardScreen({ navigation }: Props) {
                   activeOpacity={0.8}
                   onPress={() => navigation.navigate('Chat', { sessionId: session.id } as any)}
                 >
-                  <Text style={styles.historyCardTitle} numberOfLines={2}>{session.title}</Text>
+                  <View style={styles.historyCardHeader}>
+                    <Text style={styles.historyCardTitle} numberOfLines={2}>{session.title}</Text>
+                    <TouchableOpacity 
+                      onPress={() => handleDeleteSession(session.id)}
+                      style={styles.historyCardMenuBtn}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <Text style={styles.historyCardMenuIcon}>⋮</Text>
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.historyCardDate}>
                     {new Date(session.updatedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                   </Text>
@@ -352,11 +379,26 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     justifyContent: 'space-between',
     minHeight: 100,
   },
+  historyCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
   historyCardTitle: {
     color: colors.text,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
+    flex: 1,
+    paddingRight: 8,
+  },
+  historyCardMenuBtn: {
+    padding: 2,
+  },
+  historyCardMenuIcon: {
+    color: colors.textSecondary,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   historyCardDate: {
     color: colors.textSecondary,
