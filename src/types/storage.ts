@@ -34,3 +34,18 @@ export interface CurriculumData {
   entries: CurriculumEntry[];
   lastUpdated: string;
 }
+
+export interface SubjectNote {
+  subjectId: string;
+  content: string;
+  lastUpdated: string;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  mode: 'exam_copy' | 'free_problem' | 'history';
+  subject?: string;
+  messages: any[]; // On mettra any[] pour l'instant car le type Message est dans index.ts, on le type dynamiquement ou on caste
+  updatedAt: string;
+}

@@ -6,14 +6,16 @@ import SettingsScreen from '../screens/SettingsScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ApiKeysScreen from '../screens/ApiKeysScreen';
 import CurriculumScreen from '../screens/CurriculumScreen';
+import NotesScreen from '../screens/NotesScreen';
 
 export type RootStackParamList = {
   Dashboard: undefined;
   Profile: undefined;
   Settings: undefined;
-  Chat: undefined;
+  Chat: { mode?: 'exam_copy' | 'free_problem' | 'history'; subject?: string; sessionId?: string };
   ApiKeys: undefined;
   Curriculum: undefined;
+  Notes: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -44,6 +46,10 @@ export const AppNavigator = () => {
       <Stack.Screen 
         name="Curriculum" 
         component={CurriculumScreen} 
+      />
+      <Stack.Screen 
+        name="Notes" 
+        component={NotesScreen} 
       />
     </Stack.Navigator>
   );
