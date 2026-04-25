@@ -27,6 +27,12 @@ export default function ProfileScreen({ navigation }: Props) {
   const { profile, updateProfile } = useUser();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
 
+  // States: Identité (locaux pour la fluidité, synchronisés via onBlur)
+  const [firstName, setFirstName] = React.useState(profile.firstName);
+  const [lastName, setLastName] = React.useState(profile.lastName);
+  const [age, setAge] = React.useState(profile.age);
+  const [ineNumber, setIneNumber] = React.useState(profile.ineNumber);
+
   // States: Études (pour la recherche uniquement, le reste est dans le context)
   const [universityQuery, setUniversityQuery] = React.useState(profile.university);
   const [showUnivSuggestions, setShowUnivSuggestions] = React.useState(false);
@@ -122,8 +128,9 @@ export default function ProfileScreen({ navigation }: Props) {
               style={styles.textInput}
               placeholder="Ex: Thomas"
               placeholderTextColor="#6B7280"
-              value={profile.firstName}
-              onChangeText={(text) => updateProfile({ firstName: text })}
+              value={firstName}
+              onChangeText={setFirstName}
+              onBlur={() => updateProfile({ firstName })}
             />
           </View>
           <View style={styles.separator} />
@@ -133,8 +140,9 @@ export default function ProfileScreen({ navigation }: Props) {
               style={styles.textInput}
               placeholder="Ex: Dupont"
               placeholderTextColor="#6B7280"
-              value={profile.lastName}
-              onChangeText={(text) => updateProfile({ lastName: text })}
+              value={lastName}
+              onChangeText={setLastName}
+              onBlur={() => updateProfile({ lastName })}
             />
           </View>
           <View style={styles.separator} />
@@ -145,8 +153,9 @@ export default function ProfileScreen({ navigation }: Props) {
               placeholder="Ex: 21"
               placeholderTextColor="#6B7280"
               keyboardType="numeric"
-              value={profile.age}
-              onChangeText={(text) => updateProfile({ age: text })}
+              value={age}
+              onChangeText={setAge}
+              onBlur={() => updateProfile({ age })}
             />
           </View>
         </View>
@@ -272,8 +281,9 @@ export default function ProfileScreen({ navigation }: Props) {
               style={styles.textInput}
               placeholder="Ex: 123456789AZ"
               placeholderTextColor="#6B7280"
-              value={profile.ineNumber}
-              onChangeText={(text) => updateProfile({ ineNumber: text })}
+              value={ineNumber}
+              onChangeText={setIneNumber}
+              onBlur={() => updateProfile({ ineNumber })}
             />
           </View>
 

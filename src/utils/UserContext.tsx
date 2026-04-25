@@ -25,19 +25,16 @@ const defaultProfile: UserProfile = {
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [profile, setProfile] = useState<UserProfile>(defaultProfile);
-
-  useEffect(() => {
-    const savedProfile = StorageService.getProfile();
-    if (savedProfile) {
-      setProfile(savedProfile);
-    }
-  }, []);
+  const [profile, setProfile] = useState<UserProfile>(() => {
+    return StorageService.getProfile() || defaultProfile;
+  });
 
   const updateProfile = (updates: Partial<UserProfile>) => {
-    const newProfile = { ...profile, ...updates };
-    setProfile(newProfile);
-    StorageService.saveProfile(newProfile);
+    setProfile(prev => {
+      const next = { ...prev, ...updates };
+      StorageService.saveProfile(next);
+      return next;
+    });
   };
 
   return (
