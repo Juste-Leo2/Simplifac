@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,16 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
 import { useUser } from '../utils/UserContext';
 import { ThemeColors } from '../types/theme';
 import { takePhoto } from '../utils/camera';
 import { recognizeTextFromImage } from '../services/ocr';
+import { StorageService } from '../services/storage';
+import { CurriculumData, ChatSession } from '../types/storage';
+import SubjectAutocompleteModal from '../components/SubjectAutocompleteModal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -28,41 +32,45 @@ export default function DashboardScreen({ navigation }: Props) {
   const styles = React.useMemo(() => createStyles(colors), [colors]);
   const isProcessingRef = useRef(false);
 
+  const [curriculum, setCurriculum] = useState<CurriculumData | null>(null);
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [showExamModal, setShowExamModal] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      setCurriculum(StorageService.getCurriculum());
+      setChatSessions(StorageService.getChatSessions());
+    }, [])
+  );
+
   const handleAction = async (actionName: string) => {
     if (isProcessingRef.current) return;
 
-    if (actionName === 'scanner_document') {
-      isProcessingRef.current = true;
-      try {
-        const uri = await takePhoto();
-        if (uri) {
-          // La photo a été confirmée nativement par la caméra du téléphone (pas besoin de double validation)
-          console.log('Photo capturée et validée nativement:', uri);
-          
-          const recognizedText = await recognizeTextFromImage(uri);
-          if (recognizedText) {
-            console.log('Texte OCR extrait avec succès:', recognizedText.substring(0, 100) + '...');
-            
-            // FIXME: Rediriger vers l'écran de traitement complet une fois le design validé
-            // Pour le moment, on affiche simplement le texte dans une alerte pour s'assurer qu'il a bien été extrait.
-            Alert.alert(
-              "Texte Extrait 📸", 
-              recognizedText.length > 300 ? recognizedText.substring(0, 300) + "..." : recognizedText,
-              [{ text: "Super", style: "default" }]
-            );
-            
-          } else {
-            console.warn('Aucun texte reconnu ou erreur OCR');
-            Alert.alert("Erreur OCR", "Aucun texte reconnu", [{text: "OK"}]);
-          }
-        }
-      } finally {
-        isProcessingRef.current = false;
-      }
+    if (actionName === 'copie_examen') {
+      setShowExamModal(true);
       return;
     }
+
     // Action temporaire pour l'interaction
     console.log('Action pressée:', actionName);
+  };
+
+  const handleDeleteSession = (sessionId: string) => {
+    Alert.alert(
+      "Supprimer la discussion",
+      "Veux-tu supprimer cette discussion de l'historique ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        { 
+          text: "Supprimer", 
+          style: "destructive", 
+          onPress: () => {
+            StorageService.deleteChatSession(sessionId);
+            setChatSessions(StorageService.getChatSessions());
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -114,48 +122,55 @@ export default function DashboardScreen({ navigation }: Props) {
             <Text style={styles.cardText}>Demander une copie d'examen</Text>
           </TouchableOpacity>
 
-          {/* Tuile 2 */}
+          {/* Tuile Notes */}
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => handleAction('probleme_crous')}
+            onPress={() => navigation.navigate('Notes' as any)} // will fix navigation later
           >
             <View style={styles.iconContainer}>
-              <Text style={styles.cardIcon}>🏛️</Text>
+              <Text style={styles.cardIcon}>📝</Text>
             </View>
-            <Text style={styles.cardText}>Problème CROUS / Bourses</Text>
-          </TouchableOpacity>
-
-          {/* Tuile 3 */}
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.8}
-            onPress={() => handleAction('recours_master')}
-          >
-            <View style={styles.iconContainer}>
-              <Text style={styles.cardIcon}>🎓</Text>
-            </View>
-            <Text style={styles.cardText}>Recours Master / Inscription</Text>
-          </TouchableOpacity>
-
-          {/* Tuile 4 */}
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.8}
-            onPress={() => handleAction('decrypter_courrier')}
-          >
-            <View style={styles.iconContainer}>
-              <Text style={styles.cardIcon}>📬</Text>
-            </View>
-            <Text style={styles.cardText}>Décrypter un courrier</Text>
+            <Text style={styles.cardText}>Mes notes de cours</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Historique des discussions */}
+        {chatSessions.length > 0 && (
+          <View style={styles.historyContainer}>
+            <Text style={styles.sectionTitle}>Discussions récentes</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.historyScroll}>
+              {chatSessions.map((session) => (
+                <TouchableOpacity 
+                  key={session.id} 
+                  style={styles.historyCard}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('Chat', { sessionId: session.id } as any)}
+                >
+                  <View style={styles.historyCardHeader}>
+                    <Text style={styles.historyCardTitle} numberOfLines={2}>{session.title}</Text>
+                    <TouchableOpacity 
+                      onPress={() => handleDeleteSession(session.id)}
+                      style={styles.historyCardMenuBtn}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <Text style={styles.historyCardMenuIcon}>⋮</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.historyCardDate}>
+                    {new Date(session.updatedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         {/* BOUTON LANCER UNE DISCUSSION LIBRE */}
         <TouchableOpacity
           style={styles.chatShortcutButton}
           activeOpacity={0.8}
-          onPress={() => navigation.navigate('Chat')}
+          onPress={() => navigation.navigate('Chat', { mode: 'free_problem' } as any)}
         >
           <View style={styles.chatShortcutContent}>
             <Text style={styles.chatShortcutIcon}>💬</Text>
@@ -169,17 +184,15 @@ export default function DashboardScreen({ navigation }: Props) {
 
       </ScrollView>
 
-      {/* ACTION PRINCIPALE (Bouton d'action flottant / FAB) */}
-      <View style={[styles.fabContainer, { paddingBottom: Math.max(insets.bottom, 24) }]}>
-        <TouchableOpacity
-          style={styles.mainActionButton}
-          activeOpacity={0.9}
-          onPress={() => handleAction('scanner_document')}
-        >
-          <Text style={styles.mainActionIcon}>📸✨</Text>
-          <Text style={styles.mainActionText}>Scanner un document ou mail</Text>
-        </TouchableOpacity>
-      </View>
+      <SubjectAutocompleteModal
+        visible={showExamModal}
+        onClose={() => setShowExamModal(false)}
+        title="Sélectionne la matière"
+        subjects={curriculum?.entries.map(e => e.subject).filter(Boolean) || []}
+        onSelect={(subject) => {
+          navigation.navigate('Chat', { mode: 'exam_copy', subject } as any);
+        }}
+      />
     </View>
   );
 }
@@ -349,5 +362,46 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 17,
     fontWeight: '700',
+  },
+  historyContainer: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  historyScroll: {
+    paddingRight: 24, // Pour ne pas coller au bord droit
+    gap: 16,
+  },
+  historyCard: {
+    backgroundColor: colors.surfaceHighlight,
+    borderRadius: 20,
+    padding: 16,
+    width: 160,
+    justifyContent: 'space-between',
+    minHeight: 100,
+  },
+  historyCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  historyCardTitle: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+    flex: 1,
+    paddingRight: 8,
+  },
+  historyCardMenuBtn: {
+    padding: 2,
+  },
+  historyCardMenuIcon: {
+    color: colors.textSecondary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  historyCardDate: {
+    color: colors.textSecondary,
+    fontSize: 12,
   },
 });
