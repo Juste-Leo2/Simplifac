@@ -10,6 +10,7 @@ import {
   Platform,
   StatusBar,
   Alert,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -58,6 +59,8 @@ export default function ChatScreen({ route, navigation }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [attachedImageUri, setAttachedImageUri] = useState<string | null>(null);
+  const [attachedImageText, setAttachedImageText] = useState<string | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -131,11 +134,12 @@ ${profile.fieldOfStudy}`;
   };
 
   const handleSend = async () => {
-    if (!inputText.trim() || isProcessing) return;
+    if ((!inputText.trim() && !attachedImageUri) || isProcessing) return;
     
+    const userMsgText = inputText.trim() || "[Document joint]";
     const newUserMsg: Message = {
       id: Date.now().toString(),
-      text: inputText.trim(),
+      text: attachedImageUri ? `${userMsgText}\n[📸 Image jointe]` : userMsgText,
       sender: 'Student',
       createdAt: new Date().toISOString()
     };
@@ -143,6 +147,12 @@ ${profile.fieldOfStudy}`;
     const updatedMessages = [...messages, newUserMsg];
     setMessages(updatedMessages);
     setInputText('');
+    
+    // Save state locally and reset
+    const ocrText = attachedImageText;
+    setAttachedImageUri(null);
+    setAttachedImageText(null);
+
     saveSession(updatedMessages);
 
     const googleKey = StorageService.getApiKey('google');
@@ -167,13 +177,24 @@ ${profile.fieldOfStudy}`;
 
     try {
       const historyText = updatedMessages.map(m => `${m.sender === 'AI' ? 'IA' : 'Étudiant'}: ${m.text}`).join('\n');
+      
+      let ocrContext = '';
+      if (ocrText) {
+        ocrContext = `\nL'étudiant vient de joindre un document avec ce texte extrait :\n"""\n${ocrText}\n"""\n`;
+      }
+
       const prompt = `Tu es l'assistant IA de Simplifac. Tu aides un étudiant nommé ${profile.firstName || "l'étudiant"} dans ses démarches.
 Voici l'historique :
 ${historyText}
-
-Réponds au dernier message de l'étudiant. Si tu proposes un brouillon de mail ou une modification, inclus impérativement le texte complet du mail formaté dans un bloc de code \`\`\`txt
+${ocrContext}
+Réponds au dernier message de l'étudiant. 
+CONSIGNES STRICTES :
+- N'utilise AUCUN émoji.
+- N'utilise AUCUN formatage Markdown (pas de gras comme **texte**, pas de code en ligne comme \`texte\`).
+- SAUF pour le brouillon de mail qui doit IMPÉRATIVEMENT être dans un bloc \`\`\`txt
 ...
-\`\`\``;
+\`\`\`
+- Garde tes explications concises et professionnelles.`;
 
       const aiResponseText = await generateAIResponse(provider, apiKey, prompt);
       
@@ -197,73 +218,22 @@ Réponds au dernier message de l'étudiant. Si tu proposes un brouillon de mail 
 
   const handleAttach = async () => {
     if (isProcessing) return;
-    setIsProcessing(true);
     try {
       const uri = await takePhoto();
-      if (!uri) {
-        setIsProcessing(false);
-        return;
-      }
+      if (!uri) return;
       
-      Alert.alert("Analyse en cours...", "Extraction du texte depuis l'image.");
+      setAttachedImageUri(uri);
+      
+      // Extraction OCR silencieuse
       const recognizedText = await recognizeTextFromImage(uri);
-      
-      if (!recognizedText) {
-        Alert.alert("Erreur", "Aucun texte reconnu sur l'image.");
-        setIsProcessing(false);
-        return;
+      if (recognizedText) {
+        setAttachedImageText(recognizedText);
+      } else {
+        setAttachedImageText("[Texte illisible sur l'image]");
       }
-
-      const newUserMsg: Message = {
-        id: Date.now().toString(),
-        text: `[Image Scannée]\n${recognizedText}`,
-        sender: 'Student',
-        createdAt: new Date().toISOString()
-      };
-      
-      const updatedMessages = [...messages, newUserMsg];
-      setMessages(updatedMessages);
-      saveSession(updatedMessages);
-
-      const googleKey = StorageService.getApiKey('google');
-      const groqKey = StorageService.getApiKey('groq');
-      
-      if (!googleKey && !groqKey) {
-         Alert.alert("Clé API manquante", "Le texte a été extrait mais l'IA ne peut pas répondre sans clé API.", [
-           { text: "OK", style: "cancel" },
-           { text: "Configurer", onPress: () => navigation.navigate('Settings') }
-         ]);
-         setIsProcessing(false);
-         return;
-      }
-
-      const provider: AIProvider = googleKey ? 'google' : 'groq';
-      const apiKey = googleKey || groqKey || '';
-
-      const historyText = updatedMessages.map(m => `${m.sender === 'AI' ? 'IA' : 'Étudiant'}: ${m.text}`).join('\n');
-      const prompt = `Tu es l'assistant IA de Simplifac. Tu aides un étudiant nommé ${profile.firstName || "l'étudiant"}.
-Voici l'historique :
-${historyText}
-
-L'étudiant vient de te partager un texte extrait d'une image/courrier. Réponds en lui proposant une suite ou un brouillon de mail (dans un bloc \`\`\`txt).`;
-
-      const aiResponseText = await generateAIResponse(provider, apiKey, prompt);
-      
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        text: aiResponseText,
-        sender: 'AI',
-        createdAt: new Date().toISOString()
-      };
-      const finalMessages = [...updatedMessages, aiMsg];
-      setMessages(finalMessages);
-      saveSession(finalMessages);
-      setIsProcessing(false);
-
     } catch (e) {
       console.error(e);
       Alert.alert("Erreur", "Un problème est survenu lors de la prise de photo.");
-      setIsProcessing(false);
     }
   };
 
@@ -364,6 +334,24 @@ L'étudiant vient de te partager un texte extrait d'une image/courrier. Réponds
         <View style={{ height: 20 }} />
       </ScrollView>
 
+      {/* MINIATURE IMAGE JOINTE */}
+      {attachedImageUri && (
+        <View style={styles.attachmentPreviewContainer}>
+          <View style={styles.attachmentPreview}>
+            <Image source={{ uri: attachedImageUri }} style={styles.attachmentImage} />
+            <TouchableOpacity 
+              style={styles.attachmentRemoveBtn}
+              onPress={() => {
+                setAttachedImageUri(null);
+                setAttachedImageText(null);
+              }}
+            >
+              <Text style={styles.attachmentRemoveText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
       {/* ZONE DE TEXTE (Champ de saisie) */}
       <View style={[styles.inputContainer, { paddingBottom: Math.max(insets.bottom, 16) }]}>
         <TouchableOpacity style={styles.attachButton} activeOpacity={0.8} onPress={handleAttach}>
@@ -382,11 +370,11 @@ L'étudiant vient de te partager un texte extrait d'une image/courrier. Réponds
         <TouchableOpacity 
           style={[
             styles.sendButton,
-            inputText.trim().length > 0 && !isProcessing ? styles.sendButtonActive : styles.sendButtonInactive
+            (inputText.trim().length > 0 || attachedImageUri) && !isProcessing ? styles.sendButtonActive : styles.sendButtonInactive
           ]} 
           activeOpacity={0.8}
           onPress={handleSend}
-          disabled={inputText.trim().length === 0 || isProcessing}
+          disabled={(!inputText.trim().length && !attachedImageUri) || isProcessing}
         >
           <Text style={styles.sendIcon}>↗</Text>
         </TouchableOpacity>
@@ -594,6 +582,41 @@ const styles = StyleSheet.create({
   sendIcon: {
     color: '#F3F4F6',
     fontSize: 20,
+    fontWeight: 'bold',
+  },
+  attachmentPreviewContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    backgroundColor: '#0F172A',
+  },
+  attachmentPreview: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    overflow: 'hidden',
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)'
+  },
+  attachmentImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  attachmentRemoveBtn: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  attachmentRemoveText: {
+    color: '#FFF',
+    fontSize: 10,
     fontWeight: 'bold',
   },
 });
