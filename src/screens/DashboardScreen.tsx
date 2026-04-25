@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
+import { useUser } from '../utils/UserContext';
 import { ThemeColors } from '../types/theme';
 import { takePhoto } from '../utils/camera';
 import { recognizeTextFromImage } from '../services/ocr';
@@ -23,6 +24,7 @@ const FAB_SPACING = 130;
 export default function DashboardScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { colors, isDark } = useTheme();
+  const { profile } = useUser();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
   const isProcessingRef = useRef(false);
 
@@ -75,9 +77,13 @@ export default function DashboardScreen({ navigation }: Props) {
             activeOpacity={0.8}
             onPress={() => navigation.navigate('Profile')}
           >
-            <Text style={styles.avatarText}>L</Text>
+            <Text style={styles.avatarText}>
+              {profile.firstName ? profile.firstName.charAt(0).toUpperCase() : 'U'}
+            </Text>
           </TouchableOpacity>
-          <Text style={styles.greetingText}>Bonjour Léonard 👋</Text>
+          <Text style={styles.greetingText}>
+            {profile.firstName ? `Bonjour ${profile.firstName} 👋` : 'Bonjour 👋'}
+          </Text>
         </View>
         <TouchableOpacity
           style={styles.settingsButton}

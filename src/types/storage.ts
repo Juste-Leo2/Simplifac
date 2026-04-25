@@ -10,8 +10,12 @@ export interface UserProfile {
   lastName: string;
   age: string;
   university: string;
+  ufr: string;
+  studyLevel: string;
+  otherLevel: string;
   fieldOfStudy: string;
   ineNumber: string;
+  crousStatus: string;
   hasScholarship: boolean;
   hasHousing: boolean;
 }

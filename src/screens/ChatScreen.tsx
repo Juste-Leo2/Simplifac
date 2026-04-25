@@ -13,11 +13,13 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { useUser } from '../utils/UserContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Chat'>;
 
 export default function ChatScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
+  const { profile } = useUser();
   const [inputText, setInputText] = useState('');
 
   return (
@@ -61,7 +63,7 @@ export default function ChatScreen({ navigation }: Props) {
           </View>
           <View style={[styles.bubble, styles.bubbleAI]}>
             <Text style={styles.textAI}>
-              Bonjour Léonard ! 👋{"\n"}
+              {profile.firstName ? `Bonjour ${profile.firstName} ! 👋` : 'Bonjour ! 👋'}{"\n"}
               Je suis là pour t'aider à débloquer ta situation administrative. Peux-tu me décrire ton problème en quelques mots ?
             </Text>
           </View>

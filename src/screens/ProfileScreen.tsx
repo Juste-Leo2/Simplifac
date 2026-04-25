@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
+import { useUser } from '../utils/UserContext';
 import { ThemeColors } from '../types/theme';
 
 import BottomSelectModal from '../components/BottomSelectModal';
@@ -23,26 +24,32 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
 export default function ProfileScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { colors, isDark } = useTheme();
+  const { profile, updateProfile } = useUser();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
 
-  // States: Études
-  const [universityQuery, setUniversityQuery] = React.useState('');
-  const [showUnivSuggestions, setShowUnivSuggestions] = React.useState(false);
-  const [selectedUnivObj, setSelectedUnivObj] = React.useState<typeof universityData.universities[0] | null>(null);
+  // States: Identité (locaux pour la fluidité, synchronisés via onBlur)
+  const [firstName, setFirstName] = React.useState(profile.firstName);
+  const [lastName, setLastName] = React.useState(profile.lastName);
+  const [age, setAge] = React.useState(profile.age);
+  const [ineNumber, setIneNumber] = React.useState(profile.ineNumber);
 
-  const [selectedUFR, setSelectedUFR] = React.useState('');
+  // States: Études (pour la recherche uniquement, le reste est dans le context)
+  const [universityQuery, setUniversityQuery] = React.useState(profile.university);
+  const [showUnivSuggestions, setShowUnivSuggestions] = React.useState(false);
+  const [selectedUnivObj, setSelectedUnivObj] = React.useState<typeof universityData.universities[0] | null>(() => {
+    // Tenter de retrouver l'objet université à partir du nom sauvegardé
+    return universityData.universities.find(u => (u.common_name || u.official_name) === profile.university) || null;
+  });
+
   const [showUfrModal, setShowUfrModal] = React.useState(false);
 
-  const [filiere, setFiliere] = React.useState('');
+  const [filiere, setFiliere] = React.useState(profile.fieldOfStudy);
   const [showFiliereSuggestions, setShowFiliereSuggestions] = React.useState(false);
 
   const levels = choicesData.studyLevels;
-  const [selectedLevel, setSelectedLevel] = React.useState('');
-  const [otherLevel, setOtherLevel] = React.useState('');
   const [showLevelModal, setShowLevelModal] = React.useState(false);
 
   // States: CROUS
-  const [selectedCrous, setSelectedCrous] = React.useState('');
   const [showCrousModal, setShowCrousModal] = React.useState(false);
 
   // Recherche Université
@@ -58,10 +65,11 @@ export default function ProfileScreen({ navigation }: Props) {
   }, [universityQuery]);
 
   const handleSelectUniv = (univ: typeof universityData.universities[0]) => {
+    const name = univ.common_name || univ.official_name;
     setSelectedUnivObj(univ);
-    setUniversityQuery(univ.common_name || univ.official_name);
+    setUniversityQuery(name);
     setShowUnivSuggestions(false);
-    setSelectedUFR(''); // Réinitialise l'UFR
+    updateProfile({ university: name, ufr: '' });
   };
 
   // Recherche Filière
@@ -118,9 +126,11 @@ export default function ProfileScreen({ navigation }: Props) {
             <Text style={styles.label}>Prénom</Text>
             <TextInput
               style={styles.textInput}
-              placeholder="Ex: Léonard"
+              placeholder="Ex: Thomas"
               placeholderTextColor="#6B7280"
-              defaultValue="Léonard" // Placeholder pour la DB plus tard
+              value={firstName}
+              onChangeText={setFirstName}
+              onBlur={() => updateProfile({ firstName })}
             />
           </View>
           <View style={styles.separator} />
@@ -130,6 +140,9 @@ export default function ProfileScreen({ navigation }: Props) {
               style={styles.textInput}
               placeholder="Ex: Dupont"
               placeholderTextColor="#6B7280"
+              value={lastName}
+              onChangeText={setLastName}
+              onBlur={() => updateProfile({ lastName })}
             />
           </View>
           <View style={styles.separator} />
@@ -140,6 +153,9 @@ export default function ProfileScreen({ navigation }: Props) {
               placeholder="Ex: 21"
               placeholderTextColor="#6B7280"
               keyboardType="numeric"
+              value={age}
+              onChangeText={setAge}
+              onBlur={() => updateProfile({ age })}
             />
           </View>
         </View>
@@ -159,7 +175,9 @@ export default function ProfileScreen({ navigation }: Props) {
                 setShowUnivSuggestions(true);
                 if (selectedUnivObj && text !== (selectedUnivObj.common_name || selectedUnivObj.official_name)) {
                   setSelectedUnivObj(null);
-                  setSelectedUFR('');
+                  updateProfile({ university: text, ufr: '' });
+                } else if (!selectedUnivObj) {
+                  updateProfile({ university: text });
                 }
               }}
               onFocus={() => setShowUnivSuggestions(true)}
@@ -187,8 +205,8 @@ export default function ProfileScreen({ navigation }: Props) {
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>UFR / Composante</Text>
                 <TouchableOpacity onPress={() => setShowUfrModal(true)} style={styles.modalSelectBtn}>
-                  <Text style={[styles.textInput, !selectedUFR && { color: '#6B7280' }]}>
-                    {selectedUFR || "Sélectionner la composante"}
+                  <Text style={[styles.textInput, !profile.ufr && { color: '#6B7280' }]}>
+                    {profile.ufr || "Sélectionner la composante"}
                   </Text>
                   <Text style={styles.chevron}>▼</Text>
                 </TouchableOpacity>
@@ -200,14 +218,14 @@ export default function ProfileScreen({ navigation }: Props) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Niveau d'étude</Text>
             <TouchableOpacity onPress={() => setShowLevelModal(true)} style={styles.modalSelectBtn}>
-              <Text style={[styles.textInput, !selectedLevel && { color: '#6B7280' }]}>
-                {selectedLevel || "Ex: L1, Master 2..."}
+              <Text style={[styles.textInput, !profile.studyLevel && { color: '#6B7280' }]}>
+                {profile.studyLevel || "Ex: L1, Master 2..."}
               </Text>
               <Text style={styles.chevron}>▼</Text>
             </TouchableOpacity>
           </View>
 
-          {selectedLevel === 'Autres' && (
+          {profile.studyLevel === 'Autres' && (
             <>
               <View style={styles.separator} />
               <View style={styles.inputContainer}>
@@ -216,8 +234,8 @@ export default function ProfileScreen({ navigation }: Props) {
                   style={styles.textInput}
                   placeholder="Ex: BTS, BUT..."
                   placeholderTextColor="#6B7280"
-                  value={otherLevel}
-                  onChangeText={setOtherLevel}
+                  value={profile.otherLevel}
+                  onChangeText={(text) => updateProfile({ otherLevel: text })}
                 />
               </View>
             </>
@@ -246,6 +264,7 @@ export default function ProfileScreen({ navigation }: Props) {
                     onPress={() => {
                       setFiliere(f);
                       setShowFiliereSuggestions(false);
+                      updateProfile({ fieldOfStudy: f });
                     }}
                   >
                     <Text style={styles.suggestionText}>{f}</Text>
@@ -262,6 +281,9 @@ export default function ProfileScreen({ navigation }: Props) {
               style={styles.textInput}
               placeholder="Ex: 123456789AZ"
               placeholderTextColor="#6B7280"
+              value={ineNumber}
+              onChangeText={setIneNumber}
+              onBlur={() => updateProfile({ ineNumber })}
             />
           </View>
 
@@ -269,8 +291,8 @@ export default function ProfileScreen({ navigation }: Props) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Statut (CROUS)</Text>
             <TouchableOpacity onPress={() => setShowCrousModal(true)} style={styles.modalSelectBtn}>
-              <Text style={[styles.textInput, !selectedCrous && { color: '#6B7280' }]}>
-                {selectedCrous || "Sélectionner le statut"}
+              <Text style={[styles.textInput, !profile.crousStatus && { color: '#6B7280' }]}>
+                {profile.crousStatus || "Sélectionner le statut"}
               </Text>
               <Text style={styles.chevron}>▼</Text>
             </TouchableOpacity>
@@ -295,7 +317,7 @@ export default function ProfileScreen({ navigation }: Props) {
         onClose={() => setShowUfrModal(false)}
         title="Sélectionner une composante"
         options={selectedUnivObj?.components || []}
-        onSelect={setSelectedUFR}
+        onSelect={(val) => updateProfile({ ufr: val })}
       />
 
       <BottomSelectModal
@@ -303,7 +325,7 @@ export default function ProfileScreen({ navigation }: Props) {
         onClose={() => setShowLevelModal(false)}
         title="Niveau d'étude"
         options={levels}
-        onSelect={setSelectedLevel}
+        onSelect={(val) => updateProfile({ studyLevel: val })}
       />
 
       <BottomSelectModal
@@ -311,7 +333,7 @@ export default function ProfileScreen({ navigation }: Props) {
         onClose={() => setShowCrousModal(false)}
         title="Statut (CROUS)"
         options={choicesData.crousStatus}
-        onSelect={setSelectedCrous}
+        onSelect={(val) => updateProfile({ crousStatus: val })}
       />
     </View>
   );
