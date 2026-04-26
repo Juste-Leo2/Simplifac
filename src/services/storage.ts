@@ -1,12 +1,14 @@
 import 'react-native-get-random-values';
 import { createMMKV } from 'react-native-mmkv';
 import * as Keychain from 'react-native-keychain';
-import { UserPreferences, UserProfile, CurriculumData } from '../types/storage';
+import { UserPreferences, UserProfile, CurriculumData, SubjectNote, ChatSession } from '../types/storage';
 import type { AIProvider } from './ai';
 
 const SETTINGS_KEY = 'simplifac_settings';
 const PROFILE_KEY = 'simplifac_profile';
 const CURRICULUM_KEY = 'simplifac_curriculum';
+const NOTES_KEY = 'simplifac_notes';
+const CHATS_KEY = 'simplifac_chats';
 const API_KEY_PREFIX = 'api_key_';
 
 // Instance standard pour les réglages non sensibles (thème, langue...)
@@ -23,7 +25,7 @@ export const initSecureStorage = async (): Promise<boolean> => {
     const service = 'secure-profile-storage-key';
     const credentials = await Keychain.getGenericPassword({ service });
     let encryptionKey = '';
-    
+
     if (credentials) {
       encryptionKey = credentials.password;
     } else if (credentials === false) {
@@ -153,5 +155,81 @@ export const StorageService = {
       console.error('Failed to save curriculum to secure MMKV:', e);
     }
   },
+
+  // --- Notes ---
+  getNotes: (): Record<string, SubjectNote> => {
+    if (!secureStorage) return {};
+    try {
+      const data = secureStorage.getString(NOTES_KEY);
+      if (data) {
+        return JSON.parse(data);
+      }
+    } catch (e) {
+      console.error('Failed to parse notes from secure MMKV:', e);
+    }
+    return {};
+  },
+
+  saveNote: (note: SubjectNote): void => {
+    if (!secureStorage) return;
+    try {
+      const notes = StorageService.getNotes();
+      notes[note.subjectId] = note;
+      secureStorage.set(NOTES_KEY, JSON.stringify(notes));
+    } catch (e) {
+      console.error('Failed to save note to secure MMKV:', e);
+    }
+  },
+
+  // --- Chat Sessions (History) ---
+  getChatSessions: (): ChatSession[] => {
+    if (!secureStorage) return [];
+    try {
+      const data = secureStorage.getString(CHATS_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse chat sessions from secure MMKV:', e);
+    }
+    return [];
+  },
+
+  saveChatSession: (session: ChatSession): void => {
+    if (!secureStorage) return;
+    try {
+      let sessions = StorageService.getChatSessions();
+      const existingIndex = sessions.findIndex(s => s.id === session.id);
+
+      if (existingIndex >= 0) {
+        sessions[existingIndex] = session;
+      } else {
+        sessions.unshift(session);
+      }
+
+      // Limiter à 20 sessions
+      if (sessions.length > 20) {
+        sessions = sessions.slice(0, 20);
+      }
+
+      secureStorage.set(CHATS_KEY, JSON.stringify(sessions));
+    } catch (e) {
+      console.error('Failed to save chat session to secure MMKV:', e);
+    }
+  },
+
+  deleteChatSession: (id: string): void => {
+    if (!secureStorage) return;
+    try {
+      let sessions = StorageService.getChatSessions();
+      sessions = sessions.filter(s => s.id !== id);
+      secureStorage.set(CHATS_KEY, JSON.stringify(sessions));
+    } catch (e) {
+      console.error('Failed to delete chat session:', e);
+    }
+  }
 };
 
