@@ -12,12 +12,12 @@ import {
   Alert,
   Image,
 } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useUser } from '../utils/UserContext';
 import { StorageService } from '../services/storage';
-import { ChatSession, CurriculumData } from '../types/storage';
 import { Message } from '../types/index';
 import { takePhoto } from '../utils/camera';
 import { recognizeTextFromImage } from '../services/ocr';
@@ -37,8 +37,8 @@ const renderMessageText = (text: string) => {
           <TouchableOpacity 
             style={styles.copyButton}
             onPress={() => {
+              Clipboard.setString(part.trim());
               Alert.alert("Copié !", "Le texte a été copié dans le presse-papiers.");
-              // Clipboard API would go here
             }}
           >
             <Text style={styles.copyButtonText}>Copier</Text>
@@ -55,7 +55,7 @@ export default function ChatScreen({ route, navigation }: Props) {
   const { profile } = useUser();
   const params = route.params || {};
   
-  const [sessionId, setSessionId] = useState<string>(params.sessionId || Date.now().toString());
+  const [sessionId] = useState<string>(params.sessionId || Date.now().toString());
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
