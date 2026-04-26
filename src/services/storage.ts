@@ -214,7 +214,6 @@ export const StorageService = {
       if (sessions.length > 20) {
         sessions = sessions.slice(0, 20);
       }
-      }
 
       secureStorage.set(CHATS_KEY, JSON.stringify(sessions));
     } catch (e) {
