@@ -192,7 +192,7 @@ ${profile.fieldOfStudy}`;
     setIsProcessing(true);
 
     try {
-      const historyText = updatedMessages.map(m => `${m.sender === 'AI' ? 'IA' : 'Étudiant'}: ${m.text}`).join('\n');
+      const historyText = updatedMessages.map(m => (m.sender === 'AI' ? 'IA' : m.sender === 'Administration' ? 'Administration' : 'Étudiant') + ': ' + m.text).join('\\n');
       
       let ocrContext = '';
       if (ocrText) {
