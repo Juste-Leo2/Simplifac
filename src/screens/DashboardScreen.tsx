@@ -126,7 +126,7 @@ export default function DashboardScreen({ navigation }: Props) {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('Notes' as any)} // will fix navigation later
+            onPress={() => navigation.navigate('Notes')}
           >
             <View style={styles.iconContainer}>
               <Text style={styles.cardIcon}>📝</Text>
