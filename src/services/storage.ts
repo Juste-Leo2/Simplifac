@@ -25,7 +25,7 @@ export const initSecureStorage = async (): Promise<boolean> => {
     const service = 'secure-profile-storage-key';
     const credentials = await Keychain.getGenericPassword({ service });
     let encryptionKey = '';
-    
+
     if (credentials) {
       encryptionKey = credentials.password;
     } else if (credentials === false) {
@@ -203,24 +203,24 @@ export const StorageService = {
     try {
       let sessions = StorageService.getChatSessions();
       const existingIndex = sessions.findIndex(s => s.id === session.id);
-      
+
       if (existingIndex >= 0) {
         sessions[existingIndex] = session;
       } else {
         sessions.unshift(session);
       }
-      
+
       // Limiter à 5 sessions
-      if (sessions.length > 5) {
-        sessions = sessions.slice(0, 5);
+      if (sessions.length > 20) {
+        sessions = sessions.slice(0, 20);
       }
-      
+
       secureStorage.set(CHATS_KEY, JSON.stringify(sessions));
     } catch (e) {
       console.error('Failed to save chat session to secure MMKV:', e);
     }
   },
-  
+
   deleteChatSession: (id: string): void => {
     if (!secureStorage) return;
     try {
