@@ -259,7 +259,7 @@ CONSIGNES STRICTES :
   return (
     <KeyboardAvoidingView 
       style={styles.container}
-      behavior="padding"
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
 
