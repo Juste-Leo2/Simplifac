@@ -25,7 +25,6 @@ export default function NotesScreen({ navigation }: Props) {
   const { colors, isDark } = useTheme();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
 
-  const [, setCurriculum] = useState<CurriculumData | null>(null);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [showSubjectModal, setShowSubjectModal] = useState(false);
