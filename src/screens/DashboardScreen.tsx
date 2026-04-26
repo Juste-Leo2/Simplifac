@@ -145,7 +145,7 @@ export default function DashboardScreen({ navigation }: Props) {
                   key={session.id} 
                   style={styles.historyCard}
                   activeOpacity={0.8}
-                  onPress={() => navigation.navigate('Chat', { sessionId: session.id } as any)}
+                  onPress={() => navigation.navigate('Chat', { sessionId: session.id })}
                 >
                   <View style={styles.historyCardHeader}>
                     <Text style={styles.historyCardTitle} numberOfLines={2}>{session.title}</Text>
