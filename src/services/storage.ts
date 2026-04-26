@@ -210,9 +210,10 @@ export const StorageService = {
         sessions.unshift(session);
       }
 
-      // Limiter à 5 sessions
+      // Limiter à 20 sessions
       if (sessions.length > 20) {
         sessions = sessions.slice(0, 20);
+      }
       }
 
       secureStorage.set(CHATS_KEY, JSON.stringify(sessions));
