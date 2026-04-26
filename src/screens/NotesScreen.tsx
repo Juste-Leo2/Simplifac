@@ -14,8 +14,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
 import { ThemeColors } from '../types/theme';
-import { StorageService } from '../services/storage';
-import { CurriculumData } from '../types/storage';
+import { StorageService, initSecureStorage } from '../services/storage';
 import SubjectAutocompleteModal from '../components/SubjectAutocompleteModal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Notes'>;
@@ -30,18 +29,21 @@ export default function NotesScreen({ navigation }: Props) {
   const [showSubjectModal, setShowSubjectModal] = useState(false);
   const [noteContent, setNoteContent] = useState('');
   
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const data = StorageService.getCurriculum();
-    setCurriculum(data);
-    if (data && data.entries.length > 0) {
-      const subjList = data.entries.map(e => e.subject).filter(Boolean);
-      setSubjects(subjList);
-      if (subjList.length > 0) {
-        handleSelectSubject(subjList[0]);
+    const loadData = async () => {
+      await initSecureStorage();
+      const data = StorageService.getCurriculum();
+      if (data) {
+        const subjList = data.entries?.map(e => e.subject).filter(Boolean) || [];
+        setSubjects(subjList);
+        if (subjList.length > 0) {
+          handleSelectSubject(subjList[0]);
+        }
       }
-    }
+    };
+    loadData();
 
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
