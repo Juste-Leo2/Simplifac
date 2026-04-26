@@ -15,7 +15,6 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
 import { ThemeColors } from '../types/theme';
 import { StorageService } from '../services/storage';
-import { CurriculumData } from '../types/storage';
 import SubjectAutocompleteModal from '../components/SubjectAutocompleteModal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Notes'>;
@@ -30,11 +29,10 @@ export default function NotesScreen({ navigation }: Props) {
   const [showSubjectModal, setShowSubjectModal] = useState(false);
   const [noteContent, setNoteContent] = useState('');
   
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const data = StorageService.getCurriculum();
-    setCurriculum(data);
     if (data && data.entries.length > 0) {
       const subjList = data.entries.map(e => e.subject).filter(Boolean);
       setSubjects(subjList);
