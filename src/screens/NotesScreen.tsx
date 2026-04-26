@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../utils/ThemeContext';
 import { ThemeColors } from '../types/theme';
 import { StorageService } from '../services/storage';
-import { CurriculumData, SubjectNote } from '../types/storage';
+import { CurriculumData } from '../types/storage';
 import SubjectAutocompleteModal from '../components/SubjectAutocompleteModal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Notes'>;
@@ -25,7 +25,7 @@ export default function NotesScreen({ navigation }: Props) {
   const { colors, isDark } = useTheme();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
 
-  const [curriculum, setCurriculum] = useState<CurriculumData | null>(null);
+  const [, setCurriculum] = useState<CurriculumData | null>(null);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [showSubjectModal, setShowSubjectModal] = useState(false);
@@ -43,6 +43,10 @@ export default function NotesScreen({ navigation }: Props) {
         handleSelectSubject(subjList[0]);
       }
     }
+
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
   }, []);
 
   const handleSelectSubject = (subject: string) => {
