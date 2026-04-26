@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  KeyboardAvoidingView,
   Platform,
   StatusBar,
   Alert,
   Image,
+  Keyboard,
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -61,7 +61,23 @@ export default function ChatScreen({ route, navigation }: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [attachedImageUri, setAttachedImageUri] = useState<string | null>(null);
   const [attachedImageText, setAttachedImageText] = useState<string | null>(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => setKeyboardHeight(e.endCoordinates.height)
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardHeight(0)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (params.sessionId) {
@@ -257,10 +273,7 @@ CONSIGNES STRICTES :
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
 
       {/* HEADER */}
@@ -379,7 +392,8 @@ CONSIGNES STRICTES :
           <Text style={styles.sendIcon}>↗</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+      <View style={{ height: keyboardHeight }} />
+    </View>
   );
 }
 
