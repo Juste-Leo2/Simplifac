@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
+import { MailEntry, MailThread, UserProfile } from '../types/storage';
 
 export type AIProvider = 'google' | 'groq';
 
@@ -147,4 +148,117 @@ async function googleGenerateWithPdf(apiKey: string, prompt: string, pdfBase64: 
     },
   });
   return response.text ?? '';
+}
+
+// ─── Mail Assistant ─────────────────────────────────────────────────────────
+
+const MAIL_PARSER_PROMPT = `Tu es un assistant qui analyse des mails universitaires scannés par OCR.
+À partir du texte brut fourni, extrais les informations du mail et retourne UNIQUEMENT un objet JSON valide (sans commentaire, sans markdown, juste le JSON).
+L'objet doit contenir :
+- "subject" (string, l'objet du mail si visible, sinon déduis-le du contenu)
+- "from" (string, l'expéditeur si visible, sinon "Inconnu")
+- "content" (string, le corps du mail nettoyé et reformaté proprement)
+
+Si le texte OCR est trop brouillé, fais de ton mieux pour reconstituer le mail.
+Retourne toujours un objet JSON valide.`;
+
+/**
+ * Parses a scanned email (OCR text) into a structured MailEntry.
+ */
+export async function parseMailFromOCR(
+  provider: AIProvider,
+  apiKey: string,
+  ocrText: string,
+): Promise<Omit<MailEntry, 'id' | 'type' | 'confirmedByUser'>> {
+  const message = `${MAIL_PARSER_PROMPT}\n\nTexte OCR du mail :\n${ocrText}`;
+  const response = await generateAIResponse(provider, apiKey, message);
+
+  console.log('[AI] Mail parsé (500 premiers chars):', response.substring(0, 500));
+
+  const jsonMatch = response.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    return { subject: 'Sans objet', from: 'Inconnu', content: ocrText };
+  }
+
+  try {
+    const parsed = JSON.parse(jsonMatch[0]);
+    return {
+      subject: parsed.subject || 'Sans objet',
+      from: parsed.from || 'Inconnu',
+      content: parsed.content || ocrText,
+    };
+  } catch {
+    return { subject: 'Sans objet', from: 'Inconnu', content: ocrText };
+  }
+}
+
+const MAIL_CREATE_PROMPT = `Tu es un assistant qui aide un étudiant à rédiger des mails professionnels et polis.
+Tu vas recevoir un fil de mails au format JSON contenant les mails déjà échangés (reçus et envoyés).
+Tu dois rédiger un NOUVEAU mail en tenant compte de tout le contexte.
+
+CONSIGNES STRICTES :
+- Adopte un ton formel, professionnel mais pas trop distant.
+- Utilise les formules de politesse appropriées (Bonjour Monsieur/Madame, Cordialement, etc.)
+- N'invente PAS d'informations que l'étudiant n'a pas fournies.
+- Retourne UNIQUEMENT le corps du mail (texte brut, pas de JSON, pas de markdown).
+- N'utilise AUCUN émoji.`;
+
+const MAIL_IMPROVE_PROMPT = `Tu es un assistant qui aide un étudiant à améliorer un brouillon de mail.
+Tu vas recevoir un fil de mails au format JSON. Le dernier élément de type "draft" est le brouillon actuel à améliorer.
+Applique l'instruction de l'étudiant pour produire une version améliorée du brouillon.
+
+CONSIGNES STRICTES :
+- Garde le même ton formel et professionnel.
+- N'invente PAS d'informations que l'étudiant n'a pas fournies.
+- Retourne UNIQUEMENT le corps du mail amélioré (texte brut, pas de JSON, pas de markdown).
+- N'utilise AUCUN émoji.`;
+
+/**
+ * Generates or improves a mail draft using the full thread as JSON context.
+ * - No draft in thread → creates a new mail (MAIL_CREATE_PROMPT)
+ * - Draft exists → improves it (MAIL_IMPROVE_PROMPT)
+ */
+export async function generateMailDraft(
+  provider: AIProvider,
+  apiKey: string,
+  mailThread: MailThread,
+  studentProfile: UserProfile,
+  userInstruction?: string,
+): Promise<string> {
+  // Serialize thread as clean JSON (only relevant fields)
+  const cleanMails = mailThread.mails.map(m => ({
+    type: m.type,
+    subject: m.subject,
+    ...(m.from && { from: m.from }),
+    ...(m.to && { to: m.to }),
+    content: m.content,
+  }));
+
+  const threadJson = JSON.stringify({
+    discussion: mailThread.discussion,
+    mails: cleanMails,
+  }, null, 2);
+
+  const profileJson = JSON.stringify({
+    prenom: studentProfile.firstName || undefined,
+    nom: studentProfile.lastName || undefined,
+    filiere: studentProfile.fieldOfStudy || undefined,
+    universite: studentProfile.university || undefined,
+    niveau: studentProfile.studyLevel || undefined,
+  }, null, 2);
+
+  const hasDraft = mailThread.mails.some(m => m.type === 'draft');
+  const prompt = hasDraft ? MAIL_IMPROVE_PROMPT : MAIL_CREATE_PROMPT;
+
+  const message = `${prompt}
+
+Profil de l'étudiant :
+${profileJson}
+
+Fil de mails (JSON) :
+${threadJson}
+
+${userInstruction ? `INSTRUCTION DE L'ÉTUDIANT : ${userInstruction}` : 'Rédige le mail.'}`;
+
+  return generateAIResponse(provider, apiKey, message);
 }

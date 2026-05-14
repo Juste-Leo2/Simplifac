@@ -41,11 +41,33 @@ export interface SubjectNote {
   lastUpdated: string;
 }
 
+export type MailEntryType = 'received' | 'draft' | 'sent';
+
+export interface MailEntry {
+  id: number;
+  type: MailEntryType;
+  subject: string;
+  from?: string;
+  to?: string;
+  content: string;
+  extractedAt?: string;
+  confirmedByUser: boolean;
+  draftVersion?: number;
+  finalizedByUser?: boolean;
+  finalizedAt?: string;
+}
+
+export interface MailThread {
+  discussion: string;
+  mails: MailEntry[];
+}
+
 export interface ChatSession {
   id: string;
   title: string;
-  mode: 'exam_copy' | 'free_problem' | 'history';
+  mode: 'exam_copy' | 'free_problem' | 'history' | 'mail_thread';
   subject?: string;
-  messages: any[]; // On mettra any[] pour l'instant car le type Message est dans index.ts, on le type dynamiquement ou on caste
+  messages: any[];
+  mailThread?: MailThread;
   updatedAt: string;
 }

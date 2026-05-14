@@ -7,12 +7,14 @@ import ChatScreen from '../screens/ChatScreen';
 import ApiKeysScreen from '../screens/ApiKeysScreen';
 import CurriculumScreen from '../screens/CurriculumScreen';
 import NotesScreen from '../screens/NotesScreen';
+import MailThreadScreen from '../screens/MailThreadScreen';
 
 export type RootStackParamList = {
   Dashboard: undefined;
   Profile: undefined;
   Settings: undefined;
   Chat: { mode?: 'exam_copy' | 'free_problem' | 'history'; subject?: string; sessionId?: string };
+  MailThread: { sessionId?: string };
   ApiKeys: undefined;
   Curriculum: undefined;
   Notes: undefined;
@@ -50,6 +52,10 @@ export const AppNavigator = () => {
       <Stack.Screen 
         name="Notes" 
         component={NotesScreen} 
+      />
+      <Stack.Screen 
+        name="MailThread" 
+        component={MailThreadScreen} 
       />
     </Stack.Navigator>
   );
