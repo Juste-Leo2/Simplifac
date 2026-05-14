@@ -7,6 +7,8 @@ import {
   ScrollView,
   StatusBar,
   Alert,
+  Animated,
+  Modal,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -35,6 +37,7 @@ export default function DashboardScreen({ navigation }: Props) {
   const [curriculum, setCurriculum] = useState<CurriculumData | null>(null);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [showExamModal, setShowExamModal] = useState(false);
+  const [showHistoryDropdown, setShowHistoryDropdown] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -122,6 +125,18 @@ export default function DashboardScreen({ navigation }: Props) {
             <Text style={styles.cardText}>Demander une copie d'examen</Text>
           </TouchableOpacity>
 
+          {/* Tuile Mail */}
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('MailThread', {})}
+          >
+            <View style={styles.iconContainer}>
+              <Text style={styles.cardIcon}>✉️</Text>
+            </View>
+            <Text style={styles.cardText}>Mail</Text>
+          </TouchableOpacity>
+
           {/* Tuile Notes */}
           <TouchableOpacity
             style={styles.card}
@@ -135,35 +150,20 @@ export default function DashboardScreen({ navigation }: Props) {
           </TouchableOpacity>
         </View>
 
-        {/* Historique des discussions */}
+        {/* Historique des discussions — bouton déroulant */}
         {chatSessions.length > 0 && (
-          <View style={styles.historyContainer}>
-            <Text style={styles.sectionTitle}>Discussions récentes</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.historyScroll}>
-              {chatSessions.map((session) => (
-                <TouchableOpacity 
-                  key={session.id} 
-                  style={styles.historyCard}
-                  activeOpacity={0.8}
-                  onPress={() => navigation.navigate('Chat', { sessionId: session.id })}
-                >
-                  <View style={styles.historyCardHeader}>
-                    <Text style={styles.historyCardTitle} numberOfLines={2}>{session.title}</Text>
-                    <TouchableOpacity 
-                      onPress={() => handleDeleteSession(session.id)}
-                      style={styles.historyCardMenuBtn}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                      <Text style={styles.historyCardMenuIcon}>⋮</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <Text style={styles.historyCardDate}>
-                    {new Date(session.updatedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
+          <TouchableOpacity
+            style={styles.historyDropdownBtn}
+            activeOpacity={0.8}
+            onPress={() => setShowHistoryDropdown(true)}
+          >
+            <Text style={styles.historyDropdownBtnIcon}>💬</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.historyDropdownBtnTitle}>Discussions récentes</Text>
+              <Text style={styles.historyDropdownBtnSub}>{chatSessions.length} discussion{chatSessions.length > 1 ? 's' : ''}</Text>
+            </View>
+            <Text style={styles.historyDropdownArrow}>▼</Text>
+          </TouchableOpacity>
         )}
 
         {/* BOUTON LANCER UNE DISCUSSION LIBRE */}
@@ -193,6 +193,57 @@ export default function DashboardScreen({ navigation }: Props) {
           navigation.navigate('Chat', { mode: 'exam_copy', subject } as any);
         }}
       />
+
+      {/* BOTTOM SHEET HISTORY */}
+      <Modal visible={showHistoryDropdown} animationType="slide" transparent>
+        <TouchableOpacity
+          style={styles.dropdownOverlay}
+          activeOpacity={1}
+          onPress={() => setShowHistoryDropdown(false)}
+        >
+          <View style={[styles.dropdownPanel, { paddingBottom: Math.max(insets.bottom, 16) + 16 }]}>
+            <View style={styles.dropdownHeader}>
+              <Text style={styles.dropdownTitle}>Discussions</Text>
+              <TouchableOpacity onPress={() => setShowHistoryDropdown(false)}>
+                <Text style={styles.dropdownClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.dropdownScroll} showsVerticalScrollIndicator={false}>
+              {chatSessions.map((session) => (
+                <TouchableOpacity
+                  key={session.id}
+                  style={styles.dropdownItem}
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    setShowHistoryDropdown(false);
+                    if (session.mode === 'mail_thread') {
+                      navigation.navigate('MailThread', { sessionId: session.id });
+                    } else {
+                      navigation.navigate('Chat', { sessionId: session.id });
+                    }
+                  }}
+                >
+                  <Text style={styles.dropdownItemIcon}>
+                    {session.mode === 'mail_thread' ? '📬' : '💬'}
+                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.dropdownItemTitle} numberOfLines={1}>{session.title}</Text>
+                    <Text style={styles.dropdownItemDate}>
+                      {new Date(session.updatedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteSession(session.id)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Text style={styles.dropdownItemDelete}>🗑</Text>
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -363,45 +414,91 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
   },
-  historyContainer: {
+  historyDropdownBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 16,
     marginTop: 8,
     marginBottom: 8,
   },
-  historyScroll: {
-    paddingRight: 24, // Pour ne pas coller au bord droit
-    gap: 16,
+  historyDropdownBtnIcon: {
+    fontSize: 22,
+    marginRight: 14,
   },
-  historyCard: {
-    backgroundColor: colors.surfaceHighlight,
-    borderRadius: 20,
-    padding: 16,
-    width: 160,
-    justifyContent: 'space-between',
-    minHeight: 100,
-  },
-  historyCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  historyCardTitle: {
+  historyDropdownBtnTitle: {
     color: colors.text,
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-    flex: 1,
-    paddingRight: 8,
+    fontSize: 15,
+    fontWeight: '700',
   },
-  historyCardMenuBtn: {
-    padding: 2,
-  },
-  historyCardMenuIcon: {
-    color: colors.textSecondary,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  historyCardDate: {
+  historyDropdownBtnSub: {
     color: colors.textSecondary,
     fontSize: 12,
+    marginTop: 2,
+  },
+  historyDropdownArrow: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  // Bottom sheet modal
+  dropdownOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  dropdownPanel: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    maxHeight: '70%',
+  },
+  dropdownHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  dropdownTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  dropdownClose: {
+    color: colors.textSecondary,
+    fontSize: 20,
+    fontWeight: 'bold',
+    padding: 4,
+  },
+  dropdownScroll: {
+    flexGrow: 0,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  dropdownItemIcon: {
+    fontSize: 20,
+    marginRight: 14,
+  },
+  dropdownItemTitle: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  dropdownItemDate: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  dropdownItemDelete: {
+    fontSize: 16,
+    marginLeft: 12,
   },
 });
