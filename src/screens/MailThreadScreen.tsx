@@ -51,6 +51,14 @@ export default function MailThreadScreen({ route, navigation }: Props) {
   }, []);
 
   useEffect(() => {
+    if (thread.mails.length > 0) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [thread.mails.length]);
+
+  useEffect(() => {
     if (params.sessionId) {
       const sessions = StorageService.getChatSessions();
       const session = sessions.find(s => s.id === params.sessionId);
@@ -337,7 +345,6 @@ export default function MailThreadScreen({ route, navigation }: Props) {
         ref={scrollViewRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
       >
         {thread.mails.length === 0 && !isProcessing && (
           <View style={styles.emptyState}>

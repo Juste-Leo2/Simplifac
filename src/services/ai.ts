@@ -107,7 +107,9 @@ export async function parseCurriculumText(
 
   console.log('[AI] Réponse brute (500 premiers chars):', response.substring(0, 500));
 
-  // Extraire le JSON de la réponse (au cas où l'IA ajoute du texte autour)
+  // Extract JSON from response (in case AI adds text around it)
+  // TODO: Use a more robust approach than this "greedy" regex to avoid capturing 
+  // unwanted text if AI adds brackets elsewhere.
   const jsonMatch = response.match(/\[[\s\S]*\]/);
   if (!jsonMatch) return [];
 
@@ -175,6 +177,8 @@ export async function parseMailFromOCR(
 
   console.log('[AI] Mail parsé (500 premiers chars):', response.substring(0, 500));
 
+  // TODO: Replace with a more robust extraction or use response_format: 'json_object'
+  // This regex is "greedy" and may fail if AI adds braces in its explanatory text.
   const jsonMatch = response.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     return { subject: 'Sans objet', from: 'Inconnu', content: ocrText };
