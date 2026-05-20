@@ -39,9 +39,9 @@ const renderMessageText = (text: string, navigation: any) => {
                 <Text style={styles.mailProposalIcon}>📬</Text>
                 <Text style={styles.mailProposalTitle}>Proposition de mail</Text>
               </View>
-              <Text style={styles.mailProposalSubject} numberOfLines={1}><Text style={{fontWeight: 'bold'}}>Objet :</Text> {mailData.subject}</Text>
+              <Text style={styles.mailProposalSubject} numberOfLines={1}><Text style={{ fontWeight: 'bold' }}>Objet :</Text> {mailData.subject}</Text>
               <Text style={styles.mailProposalPreview} numberOfLines={3}>{mailData.content}</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.mailProposalButton}
                 onPress={() => navigation.navigate('MailThread', { initialDraft: mailData })}
               >
@@ -59,7 +59,7 @@ const renderMessageText = (text: string, navigation: any) => {
         );
       }
     }
-    
+
     // Gérer txt comme avant au cas où
     const txtParts = part.split(/```txt([\s\S]*?)```/);
     if (txtParts.length > 1) {
@@ -68,7 +68,7 @@ const renderMessageText = (text: string, navigation: any) => {
           return (
             <View key={`${index}-${txtIndex}`} style={styles.codeBlockContainer}>
               <Text style={styles.codeBlockText}>{txtPart.trim()}</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.copyButton}
                 onPress={() => {
                   Clipboard.setString(txtPart.trim());
@@ -92,7 +92,7 @@ export default function ChatScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { profile } = useUser();
   const params = route.params || {};
-  
+
   const [sessionId] = useState<string>(params.sessionId || Date.now().toString());
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -133,10 +133,10 @@ export default function ChatScreen({ route, navigation }: Props) {
   const initNewSession = () => {
     let initialMessages: Message[] = [];
     const aiGreeting = profile.firstName ? `Bonjour ${profile.firstName} ! 👋\n` : 'Bonjour ! 👋\n';
-    
+
     if (params.mode === 'exam_copy') {
       const subject = params.subject || '';
-      
+
       let teacherName = "l'enseignant";
       const curriculum = StorageService.getCurriculum();
       if (curriculum) {
@@ -194,7 +194,7 @@ ${profile.fieldOfStudy}`;
 
   const handleSend = async () => {
     if ((!inputText.trim() && !attachedImageUri) || isProcessing) return;
-    
+
     const userMsgText = inputText.trim() || "[Document joint]";
     const newUserMsg: Message = {
       id: Date.now().toString(),
@@ -202,11 +202,11 @@ ${profile.fieldOfStudy}`;
       sender: 'Student',
       createdAt: new Date().toISOString()
     };
-    
+
     const updatedMessages = [...messages, newUserMsg];
     setMessages(updatedMessages);
     setInputText('');
-    
+
     // Save state locally and reset
     const ocrText = attachedImageText;
     setAttachedImageUri(null);
@@ -216,7 +216,7 @@ ${profile.fieldOfStudy}`;
 
     const googleKey = StorageService.getApiKey('google');
     const groqKey = StorageService.getApiKey('groq');
-    
+
     if (!googleKey && !groqKey) {
       Alert.alert(
         "Clé API manquante",
@@ -236,7 +236,7 @@ ${profile.fieldOfStudy}`;
 
     try {
       const historyText = updatedMessages.map(m => (m.sender === 'AI' ? 'IA' : m.sender === 'Administration' ? 'Administration' : 'Étudiant') + ': ' + m.text).join('\\n');
-      
+
       let ocrContext = '';
       if (ocrText) {
         ocrContext = `\nL'étudiant vient de joindre un document avec ce texte extrait :\n"""\n${ocrText}\n"""\n`;
@@ -248,11 +248,13 @@ ${historyText}
 ${ocrContext}
 Réponds au dernier message de l'étudiant. 
 CONSIGNES STRICTES :
-- Conseille l'étudiant dans sa démarche. Si tu estimes que c'est une bonne idée de rédiger un mail, précise qui cibler et pourquoi.
+- Agis comme un conseiller académique à l'écoute.
+- Si l'étudiant demande explicitement s'il doit faire un mail ou demande explicitement des conseils sur les actions à entreprendre, explique-lui si oui ou non c'est une bonne idée.
+- Si OUI (tu estimes qu'un mail est pertinent) : donne une courte explication PUIS génère directement le brouillon IMPÉRATIVEMENT dans un bloc \`\`\`json contenant un objet avec les clés "subject" (string) et "content" (string).
+- Si NON (ou si la situation ne nécessite pas de contacter quelqu'un) : réponds simplement à l'utilisateur comme lors d'une discussion classique, sans générer de brouillon.
 - N'utilise AUCUN émoji.
 - N'utilise AUCUN formatage Markdown (pas de gras comme **texte**, pas de code en ligne comme \`texte\`).
-- SAUF si tu proposes un brouillon de mail. Dans ce cas, génère le brouillon IMPÉRATIVEMENT dans un bloc \`\`\`json contenant un objet avec les clés "subject" (string) et "content" (string).
-Exemple :
+Exemple de bloc JSON à générer si un mail est nécessaire :
 \`\`\`json
 {
   "subject": "Objet du mail",
@@ -262,14 +264,14 @@ Exemple :
 - Garde tes explications concises et professionnelles.`;
 
       const aiResponseText = await generateAIResponse(provider, apiKey, prompt);
-      
+
       const newAiMsg: Message = {
         id: (Date.now() + 1).toString(),
         text: aiResponseText,
         sender: 'AI',
         createdAt: new Date().toISOString()
       };
-      
+
       const finalMessages = [...updatedMessages, newAiMsg];
       setMessages(finalMessages);
       saveSession(finalMessages);
@@ -286,9 +288,9 @@ Exemple :
     try {
       const uri = await takePhoto();
       if (!uri) return;
-      
+
       setAttachedImageUri(uri);
-      
+
       // Extraction OCR silencieuse
       const recognizedText = await recognizeTextFromImage(uri);
       if (recognizedText) {
@@ -308,8 +310,8 @@ Exemple :
       "Veux-tu revenir en arrière et supprimer ce message ?",
       [
         { text: "Annuler", style: "cancel" },
-        { 
-          text: "Supprimer", 
+        {
+          text: "Supprimer",
           style: "destructive",
           onPress: () => {
             const updatedMessages = messages.filter(m => m.id !== msgId);
@@ -359,8 +361,8 @@ Exemple :
         {messages.map((msg) => {
           const isAI = msg.sender === 'AI';
           return (
-            <TouchableOpacity 
-              key={msg.id} 
+            <TouchableOpacity
+              key={msg.id}
               style={isAI ? styles.messageRowLeft : styles.messageRowRight}
               onLongPress={() => handleDeleteMessage(msg.id)}
               delayLongPress={500}
@@ -381,7 +383,7 @@ Exemple :
             </TouchableOpacity>
           );
         })}
-        
+
         {isProcessing && (
           <View style={styles.messageRowLeft}>
             <View style={styles.avatarAIContainer}>
@@ -401,7 +403,7 @@ Exemple :
         <View style={styles.attachmentPreviewContainer}>
           <View style={styles.attachmentPreview}>
             <Image source={{ uri: attachedImageUri }} style={styles.attachmentImage} />
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.attachmentRemoveBtn}
               onPress={() => {
                 setAttachedImageUri(null);
@@ -419,7 +421,7 @@ Exemple :
         <TouchableOpacity style={styles.attachButton} activeOpacity={0.8} onPress={handleAttach}>
           <Text style={styles.attachIcon}>📎</Text>
         </TouchableOpacity>
-        
+
         <TextInput
           style={styles.textInput}
           placeholder="Rédige ton message..."
@@ -429,11 +431,11 @@ Exemple :
           multiline
         />
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[
             styles.sendButton,
             (inputText.trim().length > 0 || attachedImageUri) && !isProcessing ? styles.sendButtonActive : styles.sendButtonInactive
-          ]} 
+          ]}
           activeOpacity={0.8}
           onPress={handleSend}
           disabled={(!inputText.trim().length && !attachedImageUri) || isProcessing}
