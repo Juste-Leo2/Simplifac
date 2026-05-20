@@ -42,7 +42,8 @@ export default function DashboardScreen({ navigation }: Props) {
   useFocusEffect(
     useCallback(() => {
       setCurriculum(StorageService.getCurriculum());
-      setChatSessions(StorageService.getChatSessions());
+      const sessions = StorageService.getChatSessions();
+      setChatSessions(sessions.filter(s => s.mode !== 'mail_thread'));
     }, [])
   );
 
@@ -129,7 +130,7 @@ export default function DashboardScreen({ navigation }: Props) {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('MailThread', {})}
+            onPress={() => navigation.navigate('MailList')}
           >
             <View style={styles.iconContainer}>
               <Text style={styles.cardIcon}>📬</Text>
@@ -216,15 +217,11 @@ export default function DashboardScreen({ navigation }: Props) {
                   activeOpacity={0.8}
                   onPress={() => {
                     setShowHistoryDropdown(false);
-                    if (session.mode === 'mail_thread') {
-                      navigation.navigate('MailThread', { sessionId: session.id });
-                    } else {
-                      navigation.navigate('Chat', { sessionId: session.id });
-                    }
+                    navigation.navigate('Chat', { sessionId: session.id });
                   }}
                 >
                   <Text style={styles.dropdownItemIcon}>
-                    {session.mode === 'mail_thread' ? '📬' : '💬'}
+                    💬
                   </Text>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.dropdownItemTitle} numberOfLines={1}>{session.title}</Text>
