@@ -132,9 +132,9 @@ export default function DashboardScreen({ navigation }: Props) {
             onPress={() => navigation.navigate('MailThread', {})}
           >
             <View style={styles.iconContainer}>
-              <Text style={styles.cardIcon}>✉️</Text>
+              <Text style={styles.cardIcon}>📬</Text>
             </View>
-            <Text style={styles.cardText}>Mail</Text>
+            <Text style={styles.cardText}>Messagerie</Text>
           </TouchableOpacity>
 
           {/* Tuile Notes */}

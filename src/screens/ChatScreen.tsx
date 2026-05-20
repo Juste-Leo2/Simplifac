@@ -25,27 +25,65 @@ import { generateAIResponse, AIProvider } from '../services/ai';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Chat'>;
 
-// Simple parse for ```txt
-const renderMessageText = (text: string) => {
-  const parts = text.split(/```txt([\s\S]*?)```/);
+const renderMessageText = (text: string, navigation: any) => {
+  const parts = text.split(/```json([\s\S]*?)```/);
   return parts.map((part, index) => {
     if (index % 2 === 1) {
-      // This is a code block
-      return (
-        <View key={index} style={styles.codeBlockContainer}>
-          <Text style={styles.codeBlockText}>{part.trim()}</Text>
-          <TouchableOpacity 
-            style={styles.copyButton}
-            onPress={() => {
-              Clipboard.setString(part.trim());
-              Alert.alert("Copié !", "Le texte a été copié dans le presse-papiers.");
-            }}
-          >
-            <Text style={styles.copyButtonText}>Copier</Text>
-          </TouchableOpacity>
-        </View>
-      );
+      // Bloc JSON
+      try {
+        const mailData = JSON.parse(part.trim());
+        if (mailData.subject && mailData.content) {
+          return (
+            <View key={index} style={styles.mailProposalCard}>
+              <View style={styles.mailProposalHeader}>
+                <Text style={styles.mailProposalIcon}>📬</Text>
+                <Text style={styles.mailProposalTitle}>Proposition de mail</Text>
+              </View>
+              <Text style={styles.mailProposalSubject} numberOfLines={1}><Text style={{fontWeight: 'bold'}}>Objet :</Text> {mailData.subject}</Text>
+              <Text style={styles.mailProposalPreview} numberOfLines={3}>{mailData.content}</Text>
+              <TouchableOpacity 
+                style={styles.mailProposalButton}
+                onPress={() => navigation.navigate('MailThread', { initialDraft: mailData })}
+              >
+                <Text style={styles.mailProposalButtonText}>Ouvrir dans la messagerie</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        }
+      } catch (e) {
+        // Fallback
+        return (
+          <View key={index} style={styles.codeBlockContainer}>
+            <Text style={styles.codeBlockText}>{part.trim()}</Text>
+          </View>
+        );
+      }
     }
+    
+    // Gérer txt comme avant au cas où
+    const txtParts = part.split(/```txt([\s\S]*?)```/);
+    if (txtParts.length > 1) {
+      return txtParts.map((txtPart, txtIndex) => {
+        if (txtIndex % 2 === 1) {
+          return (
+            <View key={`${index}-${txtIndex}`} style={styles.codeBlockContainer}>
+              <Text style={styles.codeBlockText}>{txtPart.trim()}</Text>
+              <TouchableOpacity 
+                style={styles.copyButton}
+                onPress={() => {
+                  Clipboard.setString(txtPart.trim());
+                  Alert.alert("Copié !", "Le texte a été copié dans le presse-papiers.");
+                }}
+              >
+                <Text style={styles.copyButtonText}>Copier</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        }
+        return <Text key={`${index}-${txtIndex}`} style={styles.textAI}>{txtPart}</Text>;
+      });
+    }
+
     return <Text key={index} style={styles.textAI}>{part}</Text>;
   });
 };
@@ -114,10 +152,15 @@ Cordialement,
 ${profile.firstName} ${profile.lastName}
 ${profile.fieldOfStudy}`;
 
+      const jsonDraft = JSON.stringify({
+        subject: `Demande de copie d'examen - ${subject}`,
+        content: defaultTemplate
+      }, null, 2);
+
       initialMessages = [
         {
           id: Date.now().toString(),
-          text: `${aiGreeting}Voici un modèle de mail que tu peux envoyer à ton professeur pour demander ta copie en ${subject} :\n\n\`\`\`txt\n${defaultTemplate}\n\`\`\`\n\nSi tu reçois une réponse, n'hésite pas à la scanner ici avec le bouton trombone 📎, je t'aiderai à rédiger la suite !`,
+          text: `${aiGreeting}Voici un modèle de mail que tu peux envoyer à ton professeur pour demander ta copie en ${subject} :\n\n\`\`\`json\n${jsonDraft}\n\`\`\`\n\nSi tu reçois une réponse, n'hésite pas à la scanner ici avec le bouton trombone 📎, je t'aiderai à rédiger la suite !`,
           sender: 'AI',
           createdAt: new Date().toISOString()
         }
@@ -205,10 +248,16 @@ ${historyText}
 ${ocrContext}
 Réponds au dernier message de l'étudiant. 
 CONSIGNES STRICTES :
+- Conseille l'étudiant dans sa démarche. Si tu estimes que c'est une bonne idée de rédiger un mail, précise qui cibler et pourquoi.
 - N'utilise AUCUN émoji.
 - N'utilise AUCUN formatage Markdown (pas de gras comme **texte**, pas de code en ligne comme \`texte\`).
-- SAUF pour le brouillon de mail qui doit IMPÉRATIVEMENT être dans un bloc \`\`\`txt
-...
+- SAUF si tu proposes un brouillon de mail. Dans ce cas, génère le brouillon IMPÉRATIVEMENT dans un bloc \`\`\`json contenant un objet avec les clés "subject" (string) et "content" (string).
+Exemple :
+\`\`\`json
+{
+  "subject": "Objet du mail",
+  "content": "Corps du mail..."
+}
 \`\`\`
 - Garde tes explications concises et professionnelles.`;
 
@@ -324,7 +373,7 @@ CONSIGNES STRICTES :
               )}
               <View style={[styles.bubble, isAI ? styles.bubbleAI : styles.bubbleUser]}>
                 {isAI ? (
-                  renderMessageText(msg.text)
+                  renderMessageText(msg.text, navigation)
                 ) : (
                   <Text style={styles.textUser}>{msg.text}</Text>
                 )}
@@ -632,5 +681,51 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  mailProposalCard: {
+    backgroundColor: '#0F172A',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(147, 51, 234, 0.3)',
+  },
+  mailProposalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  mailProposalIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  mailProposalTitle: {
+    color: '#A78BFA',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  mailProposalSubject: {
+    color: '#F3F4F6',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  mailProposalPreview: {
+    color: '#9CA3AF',
+    fontSize: 13,
+    lineHeight: 20,
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  mailProposalButton: {
+    backgroundColor: '#9333EA',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  mailProposalButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

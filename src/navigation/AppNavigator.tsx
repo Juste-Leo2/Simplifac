@@ -14,7 +14,7 @@ export type RootStackParamList = {
   Profile: undefined;
   Settings: undefined;
   Chat: { mode?: 'exam_copy' | 'free_problem' | 'history'; subject?: string; sessionId?: string };
-  MailThread: { sessionId?: string };
+  MailThread: { sessionId?: string; initialDraft?: { subject: string; content: string } };
   ApiKeys: undefined;
   Curriculum: undefined;
   Notes: undefined;

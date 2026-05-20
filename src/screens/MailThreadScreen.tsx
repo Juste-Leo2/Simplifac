@@ -65,8 +65,31 @@ export default function MailThreadScreen({ route, navigation }: Props) {
       if (session?.mailThread) {
         setThread(session.mailThread);
       }
+    } else if (params.initialDraft) {
+      const newMail: MailEntry = {
+        id: 1,
+        type: 'draft',
+        subject: params.initialDraft.subject,
+        content: params.initialDraft.content,
+        confirmedByUser: false,
+        draftVersion: 1,
+        finalizedByUser: false,
+      };
+      const newThread: MailThread = {
+        discussion: params.initialDraft.subject,
+        mails: [newMail],
+      };
+      setThread(newThread);
+      StorageService.saveChatSession({
+        id: sessionId,
+        title: newThread.discussion || 'Nouveau fil de mails',
+        mode: 'mail_thread',
+        messages: [],
+        mailThread: newThread,
+        updatedAt: new Date().toISOString(),
+      });
     }
-  }, [params.sessionId]);
+  }, [params.sessionId, params.initialDraft, sessionId]);
 
   const getAIConfig = (): { provider: AIProvider; apiKey: string } | null => {
     const googleKey = StorageService.getApiKey('google');
