@@ -25,7 +25,7 @@ import { generateAIResponse, AIProvider } from '../services/ai';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Chat'>;
 
-const renderMessageText = (text: string, navigation: any) => {
+const renderMessageText = (text: string, navigation: Props['navigation']) => {
   const parts = text.split(/```json([\s\S]*?)```/);
   return parts.map((part, index) => {
     if (index % 2 === 1) {
