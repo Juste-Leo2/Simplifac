@@ -1,6 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { MailEntry, MailThread, UserProfile } from '../types/storage';
+import { StorageService } from './storage';
+import { anonymize, deanonymize } from './anonymizer';
 
 export type AIProvider = 'google' | 'groq';
 
@@ -34,10 +36,30 @@ export async function generateAIResponse(
     throw new Error('Clé API manquante.');
   }
 
-  if (provider === 'google') {
-    return googleGenerate(apiKey, message);
+  const prefs = StorageService.getPreferences();
+  const useAnonymization = prefs?.isAnonymizationEnabled ?? true;
+
+  let finalMessage = message;
+  let mapping: Record<string, string> = {};
+
+  if (useAnonymization) {
+    const anonResult = await anonymize(message);
+    finalMessage = anonResult.anonymizedText;
+    mapping = anonResult.mapping;
   }
-  return groqGenerate(apiKey, message);
+
+  let responseText = '';
+  if (provider === 'google') {
+    responseText = await googleGenerate(apiKey, finalMessage);
+  } else {
+    responseText = await groqGenerate(apiKey, finalMessage);
+  }
+
+  if (useAnonymization) {
+    responseText = deanonymize(responseText, mapping);
+  }
+
+  return responseText;
 }
 
 async function googleGenerate(apiKey: string, message: string): Promise<string> {

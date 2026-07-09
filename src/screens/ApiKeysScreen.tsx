@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Animated,
   Alert,
+  Switch,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -58,8 +59,16 @@ export default function ApiKeysScreen({ navigation }: Props) {
     groq: new Animated.Value(0),
   }).current;
 
+  // Anonymization setting state
+  const [isAnonymizationEnabled, setIsAnonymizationEnabled] = useState(true);
+
   // Load existing keys on mount
   useEffect(() => {
+    const prefs = StorageService.getPreferences();
+    if (prefs && prefs.isAnonymizationEnabled !== undefined) {
+      setIsAnonymizationEnabled(prefs.isAnonymizationEnabled);
+    }
+
     const loadKeys = async () => {
       for (const p of PROVIDERS) {
         const saved = StorageService.getApiKey(p.id);
@@ -111,6 +120,12 @@ export default function ApiKeysScreen({ navigation }: Props) {
         'Impossible de se connecter avec cette clé. Vérifie qu\'elle est correcte.',
       );
     }
+  };
+
+  const toggleAnonymization = (value: boolean) => {
+    setIsAnonymizationEnabled(value);
+    const prefs = StorageService.getPreferences() || { theme: 'dark' };
+    StorageService.savePreferences({ ...prefs, isAnonymizationEnabled: value });
   };
 
   const handleDelete = (provider: AIProvider) => {
@@ -272,6 +287,25 @@ export default function ApiKeysScreen({ navigation }: Props) {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
         showsVerticalScrollIndicator={false}
       >
+        {/* Anonymisation Settings */}
+        <View style={styles.settingsSection}>
+          <Text style={styles.sectionTitle}>Confidentialité</Text>
+          <View style={styles.settingRow}>
+            <View style={styles.settingTextContainer}>
+              <Text style={styles.settingLabel}>Anonymisation des données</Text>
+              <Text style={styles.settingDescription}>
+                Avant d'être envoyées à l'API, les données sensibles (noms, prénoms, lieux) sont supprimées pour protéger votre vie privée.
+              </Text>
+            </View>
+            <Switch
+              value={isAnonymizationEnabled}
+              onValueChange={toggleAnonymization}
+              trackColor={{ false: '#3F3F46', true: '#9333EA' }}
+              thumbColor={isAnonymizationEnabled ? '#FFFFFF' : '#A1A1AA'}
+            />
+          </View>
+        </View>
+
         {PROVIDERS.map(renderProviderCard)}
       </ScrollView>
     </View>
@@ -415,5 +449,40 @@ const styles = StyleSheet.create({
     color: '#818CF8',
     fontSize: 13,
     fontWeight: '600',
+  },
+  settingsSection: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    color: '#F8FAFC',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    marginLeft: 4,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1E1E38',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  settingTextContainer: {
+    flex: 1,
+    paddingRight: 16,
+  },
+  settingLabel: {
+    color: '#F8FAFC',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  settingDescription: {
+    color: '#94A3B8',
+    fontSize: 13,
+    lineHeight: 18,
   },
 });

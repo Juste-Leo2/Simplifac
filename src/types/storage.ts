@@ -2,6 +2,7 @@ import { ThemeType } from './theme';
 
 export interface UserPreferences {
   theme: ThemeType;
+  isAnonymizationEnabled?: boolean;
   // D'autres paramètres comme les notifications pourront être ajoutés ici
 }
 

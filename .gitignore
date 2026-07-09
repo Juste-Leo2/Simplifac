@@ -76,3 +76,4 @@ yarn-error.log
 
 # Environment variables
 .env
+src/assets/models/albert-wikiner-fr-onnx/
