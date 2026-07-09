@@ -51,13 +51,14 @@ const renderMessageText = (text: string, navigation: Props['navigation']) => {
           );
         }
       } catch (e) {
-        // Fallback
-        return (
-          <View key={index} style={styles.codeBlockContainer}>
-            <Text style={styles.codeBlockText}>{part.trim()}</Text>
-          </View>
-        );
+        // Fallback en cas d'erreur de parsing
       }
+
+      return (
+        <View key={index} style={styles.codeBlockContainer}>
+          <Text style={styles.codeBlockText}>{part.trim()}</Text>
+        </View>
+      );
     }
 
     // Gérer txt comme avant au cas où
