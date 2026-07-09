@@ -65,8 +65,31 @@ export default function MailThreadScreen({ route, navigation }: Props) {
       if (session?.mailThread) {
         setThread(session.mailThread);
       }
+    } else if (params.initialDraft) {
+      const newMail: MailEntry = {
+        id: 1,
+        type: 'draft',
+        subject: params.initialDraft.subject,
+        content: params.initialDraft.content,
+        confirmedByUser: false,
+        draftVersion: 1,
+        finalizedByUser: false,
+      };
+      const newThread: MailThread = {
+        discussion: params.initialDraft.subject,
+        mails: [newMail],
+      };
+      setThread(newThread);
+      StorageService.saveChatSession({
+        id: sessionId,
+        title: newThread.discussion || 'Nouveau fil de mails',
+        mode: 'mail_thread',
+        messages: [],
+        mailThread: newThread,
+        updatedAt: new Date().toISOString(),
+      });
     }
-  }, [params.sessionId]);
+  }, [params.sessionId, params.initialDraft, sessionId]);
 
   const getAIConfig = (): { provider: AIProvider; apiKey: string } | null => {
     const googleKey = StorageService.getApiKey('google');
@@ -335,9 +358,7 @@ export default function MailThreadScreen({ route, navigation }: Props) {
             {thread.mails.length} mail{thread.mails.length !== 1 ? 's' : ''}
           </Text>
         </View>
-        <TouchableOpacity style={styles.scanButton} onPress={handleScanMail} activeOpacity={0.8}>
-          <Text style={styles.scanIcon}>📸</Text>
-        </TouchableOpacity>
+        <View style={{ width: 40 }} />
       </View>
 
       {/* MAIL LIST */}
@@ -447,11 +468,6 @@ const styles = StyleSheet.create({
   headerTitleContainer: { alignItems: 'center', flex: 1, marginHorizontal: 12 },
   headerTitle: { color: '#F3F4F6', fontSize: 16, fontWeight: '700' },
   headerSubtitle: { color: '#9CA3AF', fontSize: 12, marginTop: 2 },
-  scanButton: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: '#9333EA',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  scanIcon: { fontSize: 18 },
   // Scroll
   scrollContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16 },
   // Empty

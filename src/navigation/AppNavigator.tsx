@@ -8,13 +8,15 @@ import ApiKeysScreen from '../screens/ApiKeysScreen';
 import CurriculumScreen from '../screens/CurriculumScreen';
 import NotesScreen from '../screens/NotesScreen';
 import MailThreadScreen from '../screens/MailThreadScreen';
+import MailListScreen from '../screens/MailListScreen';
 
 export type RootStackParamList = {
   Dashboard: undefined;
   Profile: undefined;
   Settings: undefined;
   Chat: { mode?: 'exam_copy' | 'free_problem' | 'history'; subject?: string; sessionId?: string };
-  MailThread: { sessionId?: string };
+  MailList: undefined;
+  MailThread: { sessionId?: string; initialDraft?: { subject: string; content: string } };
   ApiKeys: undefined;
   Curriculum: undefined;
   Notes: undefined;
@@ -52,6 +54,10 @@ export const AppNavigator = () => {
       <Stack.Screen 
         name="Notes" 
         component={NotesScreen} 
+      />
+      <Stack.Screen 
+        name="MailList" 
+        component={MailListScreen} 
       />
       <Stack.Screen 
         name="MailThread" 
