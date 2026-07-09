@@ -96,7 +96,7 @@ export default function MailListScreen({ navigation }: Props) {
               <View style={styles.mailCardContent}>
                 <Text style={styles.mailCardTitle} numberOfLines={1}>{session.title}</Text>
                 <Text style={styles.mailCardDate}>
-                  {new Date(session.updatedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+{new Date(session.updatedAt).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </Text>
               </View>
               <TouchableOpacity
