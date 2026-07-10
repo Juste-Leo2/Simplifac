@@ -8,6 +8,8 @@ export interface AnonymizationResult {
 // Les civilités à exclure du masquage
 const CIVILITIES = ['Monsieur ', 'Madame ', 'M. ', 'Mme ', 'Mr ', 'Mademoiselle ', 'Mlle '];
 
+const removeAccents = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
 export const anonymize = async (text: string): Promise<AnonymizationResult> => {
   if (!text) return { anonymizedText: text, mapping: {} };
 
@@ -35,7 +37,7 @@ export const anonymize = async (text: string): Promise<AnonymizationResult> => {
     return key;
   });
 
-  // Numéro INE (11 caractères, alphanumérique ex: 123456789EE)
+  // Numéro INE
   anonymizedText = anonymizedText.replace(/\b\d{9,10}[A-Z]{1,2}\b/gi, (match) => {
     const key = `[INE${ineCount++}]`;
     mapping[key] = match;
@@ -48,42 +50,66 @@ export const anonymize = async (text: string): Promise<AnonymizationResult> => {
 
     // Trier les entités par longueur de mot décroissante pour éviter les remplacements imbriqués partiels
     const sortedEntities = [...entities].sort((a, b) => b.word.length - a.word.length);
+    const normalizedText = removeAccents(anonymizedText);
 
     for (const entity of sortedEntities) {
       if (entity.entity_group === 'PER' || entity.entity_group === 'LOC') {
-        let originalWord = entity.word.trim();
+        let cleanWord = entity.word.trim();
+        
+        // Ignorer les mots très courts qui pourraient être des erreurs de tokenisation
+        if (cleanWord.length <= 2) continue;
 
-        // Nettoyage de la civilité pour ne masquer que le nom propre
-        if (entity.entity_group === 'PER') {
-          for (const civ of CIVILITIES) {
-            if (originalWord.toLowerCase().startsWith(civ.toLowerCase())) {
-              originalWord = originalWord.substring(civ.length).trim();
-              break;
-            }
-          }
-        }
-
-        // Si après nettoyage, il reste un mot valide
-        if (originalWord.length > 1) {
-          // On vérifie s'il n'a pas déjà été stocké dans le mapping
-          let existingKey = Object.keys(mapping).find(key => mapping[key] === originalWord);
-          let keyToUse = existingKey;
-
-          if (!keyToUse) {
-            if (entity.entity_group === 'PER') {
-              keyToUse = `[PERSONNE${personCount++}]`;
-            } else {
-              keyToUse = `[LIEU${locCount++}]`;
-            }
-            mapping[keyToUse] = originalWord;
-          }
-
-          // Remplacement global du mot dans le texte
-          // Échapper le mot original pour la regex
-          const escapedWord = originalWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          const regex = new RegExp(`\\b${escapedWord}\\b`, 'gi');
+        // Trouver toutes les occurrences de cleanWord dans le texte normalisé
+        let startIndex = 0;
+        let index = normalizedText.indexOf(cleanWord, startIndex);
+        
+        while (index !== -1) {
+          // Extraire le mot exact avec sa casse et ses accents d'origine !
+          // La normalisation NFD préserve la longueur exacte de la chaîne en JavaScript après notre regex.
+          let originalWord = anonymizedText.substring(index, index + cleanWord.length);
           
-          anonymizedText = anonymizedText.replace(regex, keyToUse);
+          // Vérifier les frontières du mot (pour ne pas remplacer "Stras" dans "Strasbourgeoise")
+          const beforeChar = index > 0 ? anonymizedText[index - 1] : ' ';
+          const afterChar = index + cleanWord.length < anonymizedText.length ? anonymizedText[index + cleanWord.length] : ' ';
+          const isWordBoundary = (char: string) => /[\s.,!?;:'"()\[\]{}\\]/.test(char);
+          
+          if ((index === 0 || isWordBoundary(beforeChar)) && 
+              (index + cleanWord.length === anonymizedText.length || isWordBoundary(afterChar))) {
+                
+            // Nettoyage de la civilité pour ne masquer que le nom propre
+            let wordToMask = originalWord;
+            if (entity.entity_group === 'PER') {
+              for (const civ of CIVILITIES) {
+                if (wordToMask.toLowerCase().startsWith(civ.toLowerCase())) {
+                  wordToMask = wordToMask.substring(civ.length).trim();
+                  break;
+                }
+              }
+            }
+
+            if (wordToMask.length > 1) {
+              let existingKey = Object.keys(mapping).find(key => mapping[key] === wordToMask);
+              let keyToUse = existingKey;
+
+              if (!keyToUse) {
+                if (entity.entity_group === 'PER') {
+                  keyToUse = `[PERSONNE${personCount++}]`;
+                } else {
+                  keyToUse = `[LIEU${locCount++}]`;
+                }
+                mapping[keyToUse] = wordToMask;
+              }
+
+              // Remplacement sécurisé via regex sur le mot exact
+              const escapedWord = wordToMask.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const regex = new RegExp(`\\b${escapedWord}\\b`, 'g');
+              anonymizedText = anonymizedText.replace(regex, keyToUse);
+            }
+          }
+          
+          // Chercher l'occurrence suivante
+          startIndex = index + cleanWord.length;
+          index = normalizedText.indexOf(cleanWord, startIndex);
         }
       }
     }

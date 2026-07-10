@@ -144,20 +144,88 @@ export interface NerEntity {
   end?: number;
 }
 
+// Découpage du texte pour éviter de dépasser la limite de tokens d'ALBERT (généralement 512)
+function chunkText(text: string, maxLength: number = 200): string[] {
+  const chunks: string[] = [];
+  let currentChunk = "";
+  
+  // Séparer par sauts de lignes et points pour garder un sens contextuel
+  const sentences = text.split(/([.\n])/);
+  
+  for (let i = 0; i < sentences.length; i++) {
+    const part = sentences[i];
+    if (currentChunk.length + part.length > maxLength) {
+      if (currentChunk.trim()) chunks.push(currentChunk.trim());
+      currentChunk = part;
+    } else {
+      currentChunk += part;
+    }
+  }
+  if (currentChunk.trim()) chunks.push(currentChunk.trim());
+  
+  return chunks;
+}
+
 export const extractEntities = async (text: string): Promise<NerEntity[]> => {
   console.log("=== DÉMARRAGE DE L'EXTRACTION NER ===");
   if (!text) return [];
   
   try {
     const classifier = await NERInference.getInstance();
+    const chunks = chunkText(text);
+    let allEntities: NerEntity[] = [];
     
-    const results = await classifier(text, {
-      aggregation_strategy: "simple"
-    });
+    for (const chunk of chunks) {
+      if (chunk.length < 2) continue;
+      
+      // On retire l'aggregation_strategy "simple" car il fusionne mal les mots sous React Native
+      // On va faire l'agrégation manuellement.
+      const results = await classifier(chunk) as Array<{entity: string, score: number, word: string, index: number}>;
+      
+      console.log(`Raw ALBERT tokens for chunk:`, JSON.stringify(results));
+      
+      let currentEntity: NerEntity | null = null;
+      let lastTokenIndex = -1;
+      
+      if (Array.isArray(results)) {
+        for (const token of results) {
+          if (token.entity === 'O') {
+            if (currentEntity) { allEntities.push(currentEntity); currentEntity = null; }
+            continue;
+          }
+          
+          const group = token.entity.replace('B-', '').replace('I-', '');
+          const cleanPiece = token.word.replace(/ /g, '').replace(/\u2581/g, '').trim();
+          
+          if (cleanPiece.length === 0) continue;
+          
+          // Le modèle ne renvoie pas toujours B- ou les espaces de séparation.
+          // La seule façon fiable de savoir si deux sous-mots appartiennent à la même entité,
+          // c'est de vérifier s'ils ont été générés à la suite (index consécutifs).
+          const isSameGroup = currentEntity && currentEntity.entity_group === group;
+          const isConsecutive = lastTokenIndex !== -1 && (token.index === lastTokenIndex + 1);
+          
+          if (currentEntity && isSameGroup && isConsecutive) {
+            // Concaténer le sous-mot qui appartient au MÊME mot consécutif (ex: "eco" + "ute")
+            currentEntity.word += cleanPiece;
+          } else {
+            // C'est un nouveau mot ou une nouvelle entité !
+            if (currentEntity) allEntities.push(currentEntity);
+            currentEntity = { entity_group: group, word: cleanPiece, score: token.score } as NerEntity;
+          }
+          
+          lastTokenIndex = token.index;
+        }
+        if (currentEntity) {
+           allEntities.push(currentEntity);
+           currentEntity = null;
+        }
+      }
+    }
     
-    console.log("NER EXTRACTED ENTITIES:", JSON.stringify(results, null, 2));
+    console.log("NER EXTRACTED ENTITIES:", JSON.stringify(allEntities, null, 2));
     
-    return results as NerEntity[];
+    return allEntities;
   } catch (error) {
     console.error("Erreur d'inférence NER :", error);
     return [];
