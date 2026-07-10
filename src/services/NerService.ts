@@ -1,19 +1,118 @@
 import { pipeline, env } from '@huggingface/transformers';
+import { Image } from 'react-native';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import { InferenceSession } from 'onnxruntime-react-native';
 
-// Configuration pour React Native
-// Utiliser le modèle local présent dans ton dossier 'assets/models/albert-wikiner-fr-onnx'
-env.allowLocalModels = true;
-env.allowRemoteModels = false; // Désactivé pour forcer le local
+// Monkey patch InferenceSession.create pour contourner la conversion Uint8Array de transformers.js
+// Transformers.js force la conversion du buffer en Uint8Array, ce qui détruit notre string de chemin.
+// On intercepte la création de session pour lui redonner le vrai chemin du fichier local !
+const originalCreate = InferenceSession.create;
+(InferenceSession as any).create = async function(arg0: any, arg1?: any, arg2?: any, arg3?: any) {
+  if (arg0 instanceof Uint8Array && arg0.length === 0 && (global as any).latestModelPath) {
+    console.log("Intercepted InferenceSession.create, using local path:", (global as any).latestModelPath);
+    return originalCreate.call(InferenceSession, (global as any).latestModelPath, arg1);
+  }
+  return originalCreate.call(InferenceSession, arg0, arg1, arg2, arg3);
+};
 
-// Mettre le chemin vers le dossier contenant le modèle (relatif pour le bundler RN)
-// Avec transformers.js et React Native, on peut utiliser des URL ou des chemins d'assets locaux
-// selon la configuration du plugin babel / metro.
-env.localModelPath = 'assets/models/'; 
+// Désactivation des requêtes distantes et du FS Node
+env.allowLocalModels = true; 
+env.allowRemoteModels = false; 
+env.useFS = false;
+env.localModelPath = 'assets/models/';
 
-/**
- * Service pour l'inférence NER avec le modèle ALBERT ONNX
- * Utilise Transformers.js pour gérer la tokenisation et l'inférence.
- */
+// Pre-load all assets via Metro bundler
+const modelAssets: Record<string, any> = {
+  'config.json': require('../assets/models/albert-wikiner-fr-onnx/config.json'),
+  'tokenizer.json': require('../assets/models/albert-wikiner-fr-onnx/tokenizer.json'),
+  'tokenizer_config.json': require('../assets/models/albert-wikiner-fr-onnx/tokenizer_config.json'),
+  'special_tokens_map.json': require('../assets/models/albert-wikiner-fr-onnx/special_tokens_map.json'),
+  'spiece.model': require('../assets/models/albert-wikiner-fr-onnx/spiece.model'),
+  'model.onnx': require('../assets/models/albert-wikiner-fr-onnx/onnx/model.onnx'),
+  'model_quantized.onnx': require('../assets/models/albert-wikiner-fr-onnx/onnx/model.onnx'),
+};
+
+// Surcharge de la méthode fetch pour intercepter les appels de transformers.js
+env.fetch = async (url: string, init?: any) => {
+  console.log("Intercepted fetch:", url);
+  
+  const parts = url.split('/');
+  const filename = parts.pop()!;
+  
+  // Récupérer l'asset correspondant
+  const asset = modelAssets[filename];
+  
+  if (asset) {
+    if (filename.endsWith('.json')) {
+      return new Response(JSON.stringify(asset), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    if (filename.endsWith('.model') || filename.endsWith('.onnx')) {
+      const uri = Image.resolveAssetSource(asset).uri;
+      
+      if (filename.endsWith('.onnx')) {
+        let modelPath = uri;
+        
+        if (uri.startsWith('http')) {
+          const destPath = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${filename}`;
+          // Toujours vérifier si le fichier est valide. Dans le doute, on peut le retélécharger,
+          // mais on va assumer qu'il est bon s'il existe pour éviter de télécharger 41Mo à chaque fois.
+          const exists = await ReactNativeBlobUtil.fs.exists(destPath);
+          
+          if (!exists) {
+            console.log("Downloading ONNX model to cache in DEV mode...");
+            await ReactNativeBlobUtil.config({ path: destPath }).fetch('GET', uri);
+          }
+          modelPath = destPath;
+        } else if (uri.startsWith('raw/')) {
+          // En production Android, l'URI des assets ressemble à "raw/model_onnx"
+          // react-native-blob-util peut générer un chemin absolu pour les assets
+          // ou onnxruntime peut le charger avec 'asset://'
+          modelPath = `asset://${filename}`; // 'asset://model.onnx' si on le met à la racine des assets
+          // Mais attention, metro bundler met les assets ailleurs. 
+          // Le plus sûr pour onnxruntime-react-native avec les assets packagés est de donner l'URI brute.
+        }
+        
+        // On sauvegarde le vrai chemin local dans une variable globale
+        (global as any).latestModelPath = modelPath;
+        
+        // On retourne un ArrayBuffer vide (0 bytes). 
+        // transformers.js va le cast en Uint8Array(0), puis appeler InferenceSession.create.
+        // Notre monkey patch attrapera cet appel et utilisera latestModelPath !
+        return {
+          arrayBuffer: async () => new ArrayBuffer(0)
+        } as any;
+      }
+
+      if (uri.startsWith('http')) {
+        // Mode développement pour spiece.model (petit fichier, fetch classique OK)
+        return fetch(uri, init);
+      } else {
+        // Mode production pour spiece.model (raw assets)
+        try {
+          const base64Str = await ReactNativeBlobUtil.fs.readFile(uri, 'base64');
+          const binaryString = global.atob ? global.atob(base64Str) : ReactNativeBlobUtil.base64.decode(base64Str);
+          const len = binaryString.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+          }
+          return new Response(bytes.buffer, {
+            headers: { 'Content-Type': 'application/octet-stream' }
+          });
+        } catch (e) {
+          console.error("Error loading asset:", filename, e);
+          throw e;
+        }
+      }
+    }
+  }
+  
+  return fetch(url, init);
+};
+
 class NERInference {
   static instance: any = null;
 
@@ -21,12 +120,15 @@ class NERInference {
     if (this.instance === null) {
       console.log("Chargement du modèle ONNX...");
       
-      // Initialisation du pipeline
+      // Initialisation du pipeline (nous passons juste un nom bidon puisque fetch est intercepté)
       this.instance = pipeline(
         'token-classification', 
         'albert-wikiner-fr-onnx', 
         { 
-          quantized: false // Utiliser false car le fichier s'appelle model.onnx (pas model_quantized.onnx)
+          quantized: false,
+          session_options: {
+            executionProviders: ['cpu'] // onnxruntime-react-native doesn't support 'wasm'
+          }
         }
       );
     }
@@ -42,21 +144,18 @@ export interface NerEntity {
   end?: number;
 }
 
-/**
- * Fonction pour extraire les entités d'un texte
- * @param text - Le texte à analyser
- * @returns Liste des entités détectées
- */
 export const extractEntities = async (text: string): Promise<NerEntity[]> => {
+  console.log("=== DÉMARRAGE DE L'EXTRACTION NER ===");
   if (!text) return [];
   
   try {
     const classifier = await NERInference.getInstance();
     
-    // On utilise l'aggregation "simple" (comme en Python) pour regrouper les sous-mots (B-PER, I-PER -> PER)
     const results = await classifier(text, {
       aggregation_strategy: "simple"
     });
+    
+    console.log("NER EXTRACTED ENTITIES:", JSON.stringify(results, null, 2));
     
     return results as NerEntity[];
   } catch (error) {

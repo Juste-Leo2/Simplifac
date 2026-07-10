@@ -12,14 +12,15 @@ const config = {
   resolver: {
     assetExts: [...defaultConfig.resolver.assetExts, 'bin', 'onnx', 'model'],
     resolveRequest: (context, moduleName, platform) => {
-      // Ignorer les dépendances web/node de transformers.js (car on utilise react-native)
-      if (
-        moduleName.startsWith('onnxruntime-node') ||
-        moduleName.startsWith('onnxruntime-web')
-      ) {
+      // Ignorer onnxruntime-node
+      if (moduleName.startsWith('onnxruntime-node')) {
         return {
           type: 'empty',
         };
+      }
+      // Rediriger onnxruntime-web vers onnxruntime-react-native
+      if (moduleName.startsWith('onnxruntime-web')) {
+        return context.resolveRequest(context, 'onnxruntime-react-native', platform);
       }
       return context.resolveRequest(context, moduleName, platform);
     },

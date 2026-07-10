@@ -91,6 +91,12 @@ export const anonymize = async (text: string): Promise<AnonymizationResult> => {
     console.error("Erreur lors de l'anonymisation NER :", error);
   }
 
+  console.log("=== RÉSULTAT DE L'ANONYMISATION ===");
+  console.log("Texte original:", text);
+  console.log("Texte anonymisé:", anonymizedText);
+  console.log("Dictionnaire (Mapping):", JSON.stringify(mapping, null, 2));
+  console.log("===================================");
+
   return { anonymizedText, mapping };
 };
 
