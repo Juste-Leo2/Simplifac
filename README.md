@@ -3,8 +3,11 @@
 **L'assistant administratif de poche, open source et solidaire, pour les étudiants.**
 
 > [!WARNING]
-> **Projet en cours de développement** : Simplifac n'est pas encore prêt pour une publication officielle. Des bugs peuvent être présents et certaines fonctionnalités sont encore manquantes ou incomplètes.
+> **Projet en Pause** : Simplifac n'est pas encore prêt pour une publication officielle. Des bugs peuvent être présents et certaines fonctionnalités sont encore manquantes ou incomplètes.
+> 
 > **Les contributions sont les bienvenues !** N'hésitez pas à ouvrir des *Issues* ou à proposer des *Pull Requests*.
+>
+> - La reprise du projet se fera probablement bien plus tard, pour ceux qui souhaitent continuer et qui seraient intéressés, voir la [PR 13](https://github.com/Juste-Leo2/Simplifac/pull/13)
 
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
